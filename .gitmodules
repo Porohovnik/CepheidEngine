@@ -1,0 +1,24 @@
+[submodule "lib/GL_layer"]
+	path = lib/GL_layer
+	url = https://github.com/Porohovnik/GL_layer
+[submodule "lib/WIN_layer"]
+	path = lib/WIN_layer
+	url = https://github.com/Porohovnik/WIN_layer
+[submodule "lib/Tuple-utilities-template-library"]
+	path = lib/Tuple-utilities-template-library
+	url = https://github.com/Porohovnik/Tuple-utilities-template-library
+[submodule "lib/glm"]
+	path = lib/glm
+	url = https://github.com/g-truc/glm
+[submodule "lib/freetype"]
+	path = lib/freetype
+	url = https://github.com/freetype/freetype
+[submodule "lib/json"]
+	path = lib/json
+	url = https://github.com/nlohmann/json
+[submodule "lib/stb_image"]
+	path = lib/stb_image
+	url = https://github.com/planetack/stb_image
+[submodule "lib/pugixml"]
+	path = lib/pugixml
+	url = https://github.com/zeux/pugixml
