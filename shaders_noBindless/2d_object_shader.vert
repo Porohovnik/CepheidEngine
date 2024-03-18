@@ -1,6 +1,6 @@
 #version 430 core
-#extension GL_ARB_bindless_texture : enable
-#extension GL_ARB_shader_draw_parameters : enable
+
+
 
 layout (location = 0) in vec3 position;
 layout (location = 4) in vec2 texKord;
@@ -31,9 +31,9 @@ layout(std430, binding = 2) buffer dataMaterial{
    Mat material[];
 };
 
-
+uniform int i;
 void main(){
-    id_=id[gl_DrawIDARB];
+    id_=i;
 
     tex=texKord;
     color_object=vec4(material[id_].r,material[id_].g,material[id_].b,material[id_].a);

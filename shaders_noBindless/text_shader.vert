@@ -1,6 +1,6 @@
 #version 430 core
-#extension GL_ARB_bindless_texture : enable
-#extension GL_ARB_shader_draw_parameters : enable
+
+
 
 layout (location = 0) in vec3 position;
 layout (location = 4) in vec2 texCord;
@@ -67,9 +67,9 @@ layout(std430,binding = 7) buffer dataGlif_info{
    Glif_info glif_info[];
 };
 
-
+uniform int i;
 void main(){
-    id_=id[gl_DrawIDARB];
+    id_=i;
 
     float size=0;
     for(int z = 0; z < gl_InstanceID; z++){

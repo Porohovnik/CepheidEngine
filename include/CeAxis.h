@@ -130,7 +130,7 @@ public:
             if(setting.type==Setting_axis::VERTICAL){
 
                 t.graf->change_position().position->new_move(glm::vec3{move_old.x,-0.5f,-0.01f});
-                t.graf->change_position().position   ->new_scale(glm::vec3{scale_old.x,1.0f,1.0f});
+                t.graf->change_position().position->new_scale(glm::vec3{scale_old.x,1.0f,1.0f});
 
                 t.graf->change_position().position->move(glm::vec3{0.0f,-min/(max-min),0.0f});
                 t.graf->change_position().position->scale(glm::vec3{1.0f,1.0f/(max-min),1.0f});

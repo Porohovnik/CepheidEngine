@@ -32,7 +32,7 @@ using Texture_S=Section_static<Image,Texture_controller_BINDLESS>;
 #else
 #include "texture.h"
 #include "image.h"
-using Font_S =Texture_S=Section_static<Image,Texture>;
+using Texture_S=Section<Image,Texture>;
 #endif
 
 using Buffer_mesh_S =Section<Mesh,Buffer_mesh>;
@@ -74,10 +74,10 @@ Storage_data<
     Data_gl_I     <TIME_BIND::SHOT, -1,GL_layer::DrawElementsIndirectCommand,GL_layer::DrawElementsIndirectCommand,nullptr,TRIVIAL_DELETE::NO>,
     Data_res_one  <TIME_BIND::FIRST_SHOT_FIRST_OBJECT, Memory,std::shared_ptr<Shades_S>,-1>,
 #else
-    GL_layer::TYPE_OBJECT_TRIANGLES,
+    GL_layer::TYPE_OBJECT_DRAW::TYPE_OBJECT_TRIANGLES,
     GL_layer::TYPE_RENDERING_ELEMENT,
     Data_gl_S     <TIME_BIND::NEVER,-1,GL_layer::DrawElementsIndirectCommand,GL_layer::DrawElementsIndirectCommand,nullptr,TRIVIAL_DELETE::NO>,
-    Data_res_one  <TIME_BIND::FIRST_SHOT_FIRST_OBJECT,                          Memory,std::shared_ptr<Shades_S>,0>,
+    Data_res_one  <TIME_BIND::FIRST_SHOT_FIRST_OBJECT, Memory,std::shared_ptr<Shades_S>,0>,
 #endif
 
     Data_gl_I     <TIME_BIND::NEVER,-2,GL_layer::DrawElementsIndirectCommand_menedger>,
@@ -131,7 +131,7 @@ public:
             this-> template add_element<std::shared_ptr<Texture_S>>(id,data.pach.string(),std::tuple(this-> template get_element_data_GL<uint64_t>()),data.pach);
             id_map_bd=(*this-> template get_element<std::shared_ptr<Texture_S>>(id))->get_id();  //а вот тут и  проблема, можно ли получть id в бд без бд?) Можно!
             #else
-            this-> template add_element<std::shared_ptr<Texture_S>>(id,pach.string(),pach);
+            this-> template add_element<std::shared_ptr<Texture_S>>(id,data.pach.string(),data.pach);
             id_map_bd=id;
             #endif
 

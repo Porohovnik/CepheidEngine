@@ -16,12 +16,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output)
 #=======================================================================================================================
 # Output file-shaders
 #=======================================================================================================================
-file(GLOB SHADERS "shaders/*.vert" "shaders/*.frag")
+set(SHADERS_PATHS "shaders" "shaders_noBindless")
 
-foreach(SHADER ${SHADERS})
-    get_filename_component(NAME_SHADER ${SHADER} NAME)
-    configure_file(${SHADER} ${DIRECRORY_SHADERS}/${NAME_SHADER} COPIONLY)
-endforeach(SHADER)
+foreach(X IN LISTS SHADERS_PATHS)
+    file(GLOB SHADERS "${X}/*.vert" "${X}/*.frag")
+    foreach(SHADER ${SHADERS})
+        get_filename_component(NAME_SHADER ${SHADER} NAME)
+        configure_file(${SHADER} ${CMAKE_BINARY_DIR}/${X}/${NAME_SHADER} COPIONLY)
+    endforeach(SHADER)
+endforeach()
+
 
 #=======================================================================================================================
 # Add build options

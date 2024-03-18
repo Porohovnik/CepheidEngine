@@ -1,5 +1,5 @@
 #version 430 core
-#extension GL_ARB_bindless_texture : enable
+
 
 in      vec2 tex;
 in      vec4 color_object;
@@ -38,13 +38,13 @@ layout(std430, binding = 11) buffer dataWin{
 };
 
 layout(early_fragment_tests) in;
-
+uniform sampler2D ourTexture;
 void main(){
     int k=int((gl_FragCoord.y-0.5)*win_data[0].widht+gl_FragCoord.x-0.5);
     hh[k]=uint(material[id_].id);
 
     if(material[id_].map_difusion!=-1){
-        color=texture2D(sampler2D(sample_id[material[id_].map_difusion]),tex);
+        color=texture(ourTexture,tex);
     }else{
         color=color_object;
     }

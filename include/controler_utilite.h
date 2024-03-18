@@ -9,8 +9,12 @@
 using namespace  CeEngine;
 
 inline static int id_global=1;
-const std::string Directory_shaders="shaders/";
 
+#ifdef BINDLES_TEXTURE
+const std::string Directory_shaders="shaders/";
+#else
+const std::string Directory_shaders="shaders_noBindless/";
+#endif
 
 auto fooooo(Position &pos){
     return pos.pos();
