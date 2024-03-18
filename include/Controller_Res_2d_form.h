@@ -113,10 +113,10 @@ public:
     Controller_Res_2d_form(Info_environment * info):Res_2d_form__<Storage_res_2d_form>(info){
         this-> template  emplace<std::shared_ptr<Buffer_mesh_S>>("plate",plate_mesh());///
         GL_layer::GLSL_code_data data_shaders;
-        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::VERTEX_SHADER>  (Directory_shaders+"Plate_vec_sheder.vert");
-        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::FRAGMENT_SHADER>(Directory_shaders+"Plate_frag_sheder.frag");
+        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::VERTEX_SHADER>  (Directory_shaders+"2d_object_shader.vert");
+        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::FRAGMENT_SHADER>(Directory_shaders+"2d_object_shader.frag");
 
-        this-> template  emplace<std::shared_ptr<Shades_S>>("PLATE_SHEDER",data_shaders);///
+        this-> template  emplace<std::shared_ptr<Shades_S>>("2D_OBJECT_SHADER",data_shaders);///
 
         std::cout<<"plate_inz"<<std::endl;
    }

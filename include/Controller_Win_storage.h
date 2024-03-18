@@ -59,10 +59,7 @@ public:
         Win_storage__<Storage_res_win,Buffer_GL>(info),background_color(background_color_),ISFU(info){
         std::cout<<"Win_inz"<<std::endl;
 
-//        this-> template  emplace<std::shared_ptr<Buffer_mesh_S>>(plate_mesh().hash(),plate_mesh);///
-//        this-> template  emplace<std::shared_ptr<Shades_S<2>>>("WIN_SHEDER",load_files<2>,std::array<std::filesystem::path,2>
-//        {Directory_shaders+"Win_vec_sheder.vert",
-//         Directory_shaders+"Win_frag_sheder.frag"});///
+//        this-> template  emplace<std::shared_ptr<Buffer_mesh_S>>(plate_mesh().hash(),plate_mesh);//
 //        this->new_status(Type_Status::VISEBLE);
     }
 

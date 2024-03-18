@@ -123,10 +123,10 @@ public:
         this->template emplace<std::shared_ptr<Buffer_mesh_S>>("plate",plate_mesh());///
 
         GL_layer::GLSL_code_data data_shaders;
-        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::VERTEX_SHADER>  (Directory_shaders+"Text_vec_sheder.vert");
-        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::FRAGMENT_SHADER>(Directory_shaders+"Text_frag_sheder.frag");
+        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::VERTEX_SHADER>  (Directory_shaders+"text_shader.vert");
+        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::FRAGMENT_SHADER>(Directory_shaders+"text_shader.frag");
 
-        this->template emplace<std::shared_ptr<Shades_S>>("TEXT_SHEDER",data_shaders);///
+        this->template emplace<std::shared_ptr<Shades_S>>("TEXT_SHADER",data_shaders);///
 
         std::cout<<"text_inz"<<std::endl;
     }

@@ -117,10 +117,10 @@ public:
         this->template emplace<std::shared_ptr<VAO_S>>("VAO_line",info_mesh);
 
         GL_layer::GLSL_code_data data_shaders;
-        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::VERTEX_SHADER>  (Directory_shaders+"Line_vec_sheder.vert");
-        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::FRAGMENT_SHADER>(Directory_shaders+"Line_frag_sheder.frag");
+        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::VERTEX_SHADER>  (Directory_shaders+"line_shader.vert");
+        data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::FRAGMENT_SHADER>(Directory_shaders+"line_shader.frag");
 
-        this-> template emplace<std::shared_ptr<Shades_S>>("LINE_SHEDER",data_shaders);///
+        this-> template emplace<std::shared_ptr<Shades_S>>("LINE_SHADER",data_shaders);///
 
         std::cout<<"line_inz"<<std::endl;
    }
