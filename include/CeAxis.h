@@ -64,11 +64,11 @@ public:
     CeAxis(Engine *win_,typename Engine::List * celist_,Data_initialization data):
         setting(data.setting),
         name_axis(celist_,CeText::Data(setting.path_font,setting.name_axis)),
-        line(celist_,CeLine::Data(line_mesh().get_data(),"line")){
+        line(celist_,CeLine::Data(line_mesh(),"line")){
 
         std::cout<<setting.name_axis<<" CeAxis: "<<setting.path_font<<std::endl;
         for (std::size_t i=0;i<setting.cout_divisions;i++) {
-           divisions_line.emplace_back(std::make_shared<CeLine>(celist_,CeLine::Data(line_mesh().get_data(),"line")));
+           divisions_line.emplace_back(std::make_shared<CeLine>(celist_,CeLine::Data(line_mesh(),"line")));
            // grid.          emplace_back(win_,celist_,Data_CeLine(line_mesh()));
            name_divisions.emplace_back(std::make_shared<CeText>(celist_,CeText::Data(setting.path_font,"1.0")));
         }

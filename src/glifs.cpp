@@ -47,7 +47,7 @@ namespace CeEngine {
             glif_infos.back().advance=face->glyph->advance.x>>6;
             glif_infos.back().max_size=size;
 
-            //std::cout<<S<<" : "<<(face->glyph->advance.x)<<std::endl;
+            //std::cout<<S<<" : "<<"|"<<face->glyph->bitmap_left<<"|"<<face->glyph->bitmap.width<<"|"<<(face->glyph->advance.x)<<"|"<<glif_infos.back().advance<<std::endl;
 
             //загрузка самого глифа
             std::shared_ptr<unsigned char[]> image_data=std::shared_ptr<unsigned char[]>(new unsigned char[(face->glyph->bitmap.width+2)*(face->glyph->bitmap.rows+2)]);

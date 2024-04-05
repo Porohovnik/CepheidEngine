@@ -103,7 +103,7 @@ class Controller_Res_2d_line:public Res_2d_line__<Storage_res_line>{
         Position pos {1.0f};
         std::shared_ptr<Mesh_data> data;
         std::string type_line="";
-        Data_CeLine(std::shared_ptr<Mesh_data> &&mesh,std::string type_line_=""):data(std::move(mesh)),type_line(type_line_){}
+        Data_CeLine(std::shared_ptr<Mesh_data> mesh,std::string type_line_=""):data(std::move(mesh)),type_line(type_line_){}
     };
 public:
     using Data=Data_CeLine;
@@ -133,19 +133,38 @@ public:
         if(data.type_line.size()==0){
             type=std::string{"id: "+std::to_string(iiiii++)};
         }
-        this-> template add_element<std::shared_ptr<Buffer_mesh_controller_S>>(id,type,
-            std::tuple( this-> template get_element<std::shared_ptr<VAO_S>>(),//хммм
-                        this-> template get_element_data_GL<std::vector<float>>(),
-                        nullptr,
-                        this-> template get_element_data_GL<GL_layer::DrawArraysIndirectCommand>(),
-                        this-> template get_element_data_GL<GL_layer::DrawArraysIndirectCommand_menedger>(),
-                        this-> template get_element_data_GL<Command_draw_info>())
-                       ,data.data);
+
+
+        std::size_t id_mesh=0;
+
+        if(this-> template get_element_data_GL<std::shared_ptr<Buffer_mesh_controller_S>>()->isData_storage(type)){
+            this-> template add_element<std::shared_ptr<Buffer_mesh_controller_S>>(id,type);
+            id_mesh=(*this-> template get_element<std::shared_ptr<Buffer_mesh_controller_S>>(id))->get_id();
+        }else {
+            Command_draw_info cdi;
+            cdi.first=static_cast<int>(this->template get_element_data_GL<std::vector<float>>()->get_begin_of_controller(data.data->vertex.size()));
+            cdi.count=static_cast<int>(data.data->vertex.size());
+
+
+            this-> template add_element<std::shared_ptr<Buffer_mesh_controller_S>>(id,type,
+                std::tuple( this-> template get_element<std::shared_ptr<VAO_S>>(),//хммм
+                            this-> template get_element_data_GL<std::vector<float>>(),
+                            cdi.first,
+                            nullptr,
+                            0)
+                ,data.data);
+
+            id_mesh=(*this-> template get_element<std::shared_ptr<Buffer_mesh_controller_S>>(id))->get_id();
+            this-> template add_element<Command_draw_info>(id_mesh,cdi);
+        }
+
 
         GL_layer::DrawArraysIndirectCommand_menedger cmd_m;
 
-        cmd_m.id_mesh=(*this-> template get_element<std::shared_ptr<Buffer_mesh_controller_S>>(id))->get_id();
-        Material_L mat{id_global++,static_cast<int>(cmd_m.id_mesh),data.color};
+        cmd_m.cmd.count= this-> template get_element<Command_draw_info>(id_mesh)->count;
+        cmd_m.cmd.first= this-> template get_element<Command_draw_info>(id_mesh)->first;
+
+        Material_L mat{id_global++,static_cast<int>(id_mesh),data.color};
 
         this-> template add_element<Position>(id,data.pos);
         this-> template add_element<Material_L>(id,mat);

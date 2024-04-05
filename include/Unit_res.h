@@ -32,9 +32,11 @@ class Unit_res{
 
     std::map<std::shared_ptr<T>,Status_count> tasks;
 public:
+    static K get_key();
+    static std::shared_ptr<T> Type();
+
     inline constexpr static TYPE_ORDER_UPDATE type_order_update = order;
 
-    static std::shared_ptr<T> Type();
     Unit_res(){}
 
     Unit_res(const Unit_res& )=delete;
@@ -49,6 +51,17 @@ public:
             status_data.emplace(data.at(key),Status_Section{key,Type_Status::CLEAR,0});
             //std::cout<<key <<"|:|"<<data.size()<<"|"<<data.at(key)<<"|"<<data.at(key).use_count()<<std::endl;
         }
+        return data.at(key);
+    }
+
+    bool isData(K key){
+        if(data.find(key)==data.end()){
+            return false;
+        }
+        return true;
+    }
+
+    decltype (auto)  get_data(K key){
         return data.at(key);
     }
 

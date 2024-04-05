@@ -10,10 +10,7 @@ class Buffer_mesh{
     VAO VAO_;//Может вызывать падения рендера
 public:
     template<typename Mesh>
-    Buffer_mesh(Mesh mesh):
-        VBO(static_cast<std::ptrdiff_t>(mesh.size_vertex()) ,mesh.data_vertex()),
-        EBO(static_cast<std::ptrdiff_t>(mesh.size_indexes()),mesh.data_indexes()),
-        VAO_(mesh.get_info(),&VBO,&EBO){}
+    Buffer_mesh(Mesh mesh):VBO(mesh->vertex),EBO(mesh->indexes),VAO_(mesh->get_info(),&VBO,&EBO){}
 
     inline void Bind(int base,int id=-1){
         VAO_.Bind(base,id);

@@ -29,7 +29,10 @@ public:
     Buffer_GL & operator=(Buffer_GL &&)=delete;
     Buffer_GL & operator=(const Buffer_GL &)=delete;
 
-    Buffer_GL(GL_layer::GLsizeiptr max_size_=0,T * array=nullptr):buffer(sizeof (T)*max_size_, array, type),max_size(max_size_){}
+    Buffer_GL(const T * array=nullptr,GL_layer::GLsizeiptr max_size_=0):buffer(sizeof (T)*max_size_, array, type),max_size(max_size_){}
+
+    template<typename Array>
+    Buffer_GL(const Array &array):buffer(sizeof (T)*array.size(), array.data(), type),max_size(array.size()){}//для последоовательных контейнеров
 
     inline bool insert(GL_layer::GLintptr id,const T * elements,GL_layer::GLsizeiptr size_insert=1,GL_layer::GLintptr offset=0){
         return  changes(elements,id,id+size_insert,offset);

@@ -73,6 +73,8 @@ add_subdirectory( ${PROJECT_SOURCE_DIR}/lib/freetype)
 add_subdirectory( ${PROJECT_SOURCE_DIR}/lib/json)
 add_subdirectory( ${PROJECT_SOURCE_DIR}/lib/pugixml)
 
+add_subdirectory( ${PROJECT_SOURCE_DIR}/lib/CDT/CDT)
+
 if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -no-pie -fPIC -std=c++20 -lXinerama -lXrandr -lXi -lXcursor -lpthread -lGLU  -lrt -lXrandr  -lXi -lXinerama -lX11  ")
 endif (UNIX)
@@ -93,8 +95,10 @@ foreach(NAME IN LISTS LIBRARY_TYPE_NAME)
     target_include_directories(${NAME} PUBLIC ${PROJECT_SOURCE_DIR}/lib/freetype/include)
     target_include_directories(${NAME} PUBLIC ${PROJECT_SOURCE_DIR}/lib/stb_image)
     target_include_directories(${NAME} PUBLIC ${PROJECT_SOURCE_DIR}/lib/json/include)
-    target_include_directories(${NAME} PUBLIC ${PROJECT_SOURCE_DIR}/lib/pugixml/srs)
-    
+    target_include_directories(${NAME} PUBLIC ${PROJECT_SOURCE_DIR}/lib/pugixml/src)
+    target_include_directories(${NAME} PUBLIC ${PROJECT_SOURCE_DIR}/lib/nanosvg/src)
+    target_include_directories(${NAME} PUBLIC ${PROJECT_SOURCE_DIR}/lib/CDT/CDT/include)
+
     target_link_libraries(${NAME} PUBLIC
     gl_layer-static
     win_layer-static
@@ -102,6 +106,7 @@ foreach(NAME IN LISTS LIBRARY_TYPE_NAME)
     freetype
     nlohmann_json
     pugixml
+    CDT
     )
 endforeach()
 

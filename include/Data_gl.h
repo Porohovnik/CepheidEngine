@@ -8,7 +8,7 @@ namespace CeEngine {
 template<TIME_BIND bind_time,int bind_base,GL_layer::BUFFER_SETTING type,GL_layer::TYPE_BUFFER type_buffer,template<typename K, GL_layer::BUFFER_SETTING a, GL_layer::TYPE_BUFFER c> class Buffer,typename T,typename J=T,J fun(T&)=nullptr,TRIVIAL_DELETE t_delete=TRIVIAL_DELETE::YES>
 class Data_gl:public Data_ABC<bind_time,T,J>{
     std::vector<T> RAM;
-    Buffer<J,type,type_buffer> SSBO_VRAM;
+    Buffer<J,type,Data_ABC<bind_time,T,J>::isNever_to_NULL(type_buffer)> SSBO_VRAM;
 
     using Data =Data_gl<bind_time,bind_base,type,type_buffer,Buffer,T,J,fun,t_delete>;
 

@@ -16,11 +16,20 @@ public:
     Data_res_one(Data_herald<Memory,Info_environment> herald):storage_res_(herald.res){}
 
     template<typename ...Arg>
-    bool emplace(Arg...arg){
+    bool emplace(decltype(std::remove_reference_t<typename S::template get_unit_type<T>>::get_key()) key ,Arg...arg){
         if(RES!=nullptr){
             storage_res_->add_task(RES,Type_Status::CLEAR);
         }
-        RES=storage_res_->template add_data<T>(std::forward<Arg>(arg)...);
+        RES=storage_res_->template add_data<T>(key,std::forward<Arg>(arg)...);
+        storage_res_->add_task(RES,Type_Status::VISEBLE);
+        return true;
+    }
+
+    std::size_t add_element(decltype(std::remove_reference_t<typename S::template get_unit_type<T>>::get_key()) key){
+        if(RES!=nullptr){
+            storage_res_->add_task(RES,Type_Status::CLEAR);
+        }
+        RES=storage_res_->template get_unit<T>()->get_data(key);
         storage_res_->add_task(RES,Type_Status::VISEBLE);
         return true;
     }

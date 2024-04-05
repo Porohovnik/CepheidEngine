@@ -7,7 +7,10 @@ namespace CeEngine {
 template<typename ...Arg>
 class Storage_resource{
     std::tuple<Arg...> storage_data{};
-public:
+public:    
+    template<typename Type>
+    using  get_unit_type = decltype (*tutl::Get_tuple_type_element<Type,std::tuple<decltype (Arg::Type())...>>(storage_data));
+
     Storage_resource(){}
 
     Storage_resource(const Storage_resource& )=delete;
@@ -35,8 +38,9 @@ public:
         return get->add_data(std::forward<Arg_>(arg_)...);
     }
 
+
     template<typename Type>
-    auto * get_unit(){
+    constexpr auto * get_unit(){
         return tutl::Get_tuple_type_element<Type,std::tuple<decltype (Arg::Type())...>>(storage_data);
     }
 

@@ -20,6 +20,14 @@ public:
     inline constexpr static TYPE_CONTAINER type_container=TYPE_CONTAINER::ARRAY;
     inline constexpr static TYPE_RES_STORAGE type_res_=TYPE_RES_STORAGE::LOCAL;
 
+
+    static constexpr GL_layer::TYPE_BUFFER isNever_to_NULL(GL_layer::TYPE_BUFFER type_buffer){
+        if constexpr (bind_time==TIME_BIND::NEVER){
+            return GL_layer::TYPE_BUFFER::NULL_;
+        }
+        return type_buffer;
+    }
+
     template<typename M>
     class Change_guard{
         M change;

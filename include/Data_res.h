@@ -17,15 +17,28 @@ public:
     template<typename Memory, typename Info_environment>
     Data_res(Data_herald<Memory,Info_environment> herald):storage_res_(herald.res){}
 
+    bool isData_storage(decltype(std::remove_reference_t<typename S::template get_unit_type<T>>::get_key()) key){
+        return storage_res_->template get_unit<T>()->isData(key);
+    }
+
     template<typename ...Arg>
-    std::size_t add_element(std::size_t id, Arg...arg){
+    std::size_t add_element(std::size_t id,decltype(std::remove_reference_t<typename S::template get_unit_type<T>>::get_key()) key, Arg...arg){
         if(RES.size()<=id){
             RES.resize(id+1,nullptr);
         }
         //std::cout<<id<<"|*********************|"<<RES.size()<<std::endl;
 
-        RES[id]=storage_res_->template add_data<T>(std::forward<Arg>(arg)...);
+        RES[id]=storage_res_->template add_data<T>(key,std::forward<Arg>(arg)...);
         //хммммммм//storage_res_->add_task(RES[id],Type_Status::VISEBLE);
+        return id;
+    }
+
+    std::size_t add_element(std::size_t id, decltype(std::remove_reference_t<typename S::template get_unit_type<T>>::get_key()) key){
+        if(RES.size()<=id){
+            RES.resize(id+1,nullptr);
+        }
+
+        RES[id]=storage_res_->template get_unit<T>()->get_data(key);
         return id;
     }
 

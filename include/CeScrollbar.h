@@ -16,7 +16,7 @@ public:
     CeScrollbar(Engine *win_,typename Engine::List * celist_,typename Engine::Data data){
         std::cout<<"CeScrollbar"<<std::endl;
 
-    };
+    }
     //
 
     void connect(Signal_engine<CeObject> * signal){

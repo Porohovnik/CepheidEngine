@@ -6,12 +6,12 @@ namespace CeEngine {
 template<TIME_BIND bind_time,int bind_base,GL_layer::BUFFER_SETTING type,GL_layer::TYPE_BUFFER type_buffer,template<typename K, GL_layer::BUFFER_SETTING a,GL_layer::TYPE_BUFFER c> class Buffer,typename T,typename J=T,J fun(T&)=nullptr>
 class Data_gl_one:public Data_ABC<bind_time,T,J>{
     T RAM;
-    Buffer<J,type,type_buffer> SSBO_VRAM;
+    Buffer<J,type,Data_ABC<bind_time,T,J>::isNever_to_NULL(type_buffer)> SSBO_VRAM;
 public:
     inline static constexpr TYPE_CONTAINER type_container=TYPE_CONTAINER::ONE;
 
     template<typename Memory, typename Info_environment>
-    Data_gl_one(Data_herald<Memory,Info_environment> herald):SSBO_VRAM(1){}
+    Data_gl_one(Data_herald<Memory,Info_environment> herald):SSBO_VRAM(nullptr,1){}
 
     bool emplace(T&&element){
         RAM=element;

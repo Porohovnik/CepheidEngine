@@ -5,6 +5,7 @@
 #include "Buffer_id.h"
 #include "Mesh_info.h"
 
+#include "GL_type_to_cpp.h"
 namespace CeEngine {
 class VAO{
     GL_layer::Buffer_id<GL_layer::TYPE_BUFFER::VERTEX_ARRAY> buffer;
@@ -25,6 +26,10 @@ public:
         if constexpr(!std::is_same_v<EBO,std::nullptr_t>){
             ebo->Bind();
         }
+        GL_layer::Bind<GL_layer::TYPE_BUFFER::VERTEX_ARRAY>(0);
+        GL_layer::Bind<GL_layer::TYPE_BUFFER::ARRAY_BUFFER> (0);
+
+        GL_layer::Bind<GL_layer::TYPE_BUFFER::ELEMENT_ARRAY_BUFFER>   (0);
     }
 
     inline void Bind([[maybe_unused]] int base, [[maybe_unused]] int id=-1){

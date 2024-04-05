@@ -21,10 +21,11 @@ public:
 
     template<typename Memory, typename Info_environment>
     Data_gl_array_no_ram_no_allocate(Data_herald<Memory,Info_environment> herald):
-        SSBO_VRAM(0),memory_controller(0){}
+        SSBO_VRAM(),memory_controller(){}
 
     inline bool new_frame(){return  false;}
 
+// можно использовать для "резервирования" места, дабы потом заполнить
     std::size_t get_begin_of_controller(std::size_t size_max_text){
         auto b=memory_controller.pull_space(size_max_text);
 
@@ -38,7 +39,7 @@ public:
     }
 
     //element -array/vector
-    auto add_element(std::size_t id,T &&element){
+    auto add_element(std::size_t id,const T &&element){
         if(vram_position.size()<=id){
             vram_position.resize(id+1);
         }
@@ -46,7 +47,19 @@ public:
         auto begin=get_begin_of_controller(element.size());
 
         vram_position[id]={static_cast<int>(begin),static_cast<int>(element.size())};
+
         //добавление элемента
+        SSBO_VRAM.insert(begin,element.data(),element.size());
+
+        return begin;
+    }
+
+    auto add_element(std::size_t id,std::size_t begin,const T &&element){
+        if(vram_position.size()<=id){
+            vram_position.resize(id+1);
+        }
+
+        vram_position[id]={static_cast<int>(begin),static_cast<int>(element.size())};
 
         SSBO_VRAM.insert(begin,element.data(),element.size());
 

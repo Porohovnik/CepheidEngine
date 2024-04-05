@@ -36,7 +36,7 @@ using Font_S = Section_static<Data_font,Font_controller_BINDLESS>;
 using Font_S = Section_static<Data_font,Font_controller<Texture>>;
 #endif
 
-using Buffer_mesh_S =Section<Mesh,Buffer_mesh>;
+using Buffer_mesh_S =Section<std::shared_ptr<Mesh_data>,Buffer_mesh>;
 using Shades_S =Section<GL_layer::GLSL_code_data,Program_GPU>;
 
 using Storage_res_text=Storage_resource<

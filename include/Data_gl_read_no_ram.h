@@ -13,7 +13,7 @@ public:
     inline bool new_frame(){return  false;}
 
     template<typename Memory, typename Info_environment>
-    Data_gl_read_no_ram(Data_herald<Memory,Info_environment> herald):SSBO_VRAM(0){}
+    Data_gl_read_no_ram(Data_herald<Memory,Info_environment> herald):SSBO_VRAM(){}
 
     inline void bind(int id) const{}
 

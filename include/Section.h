@@ -10,6 +10,7 @@ protected:
     std::optional<J>   RAM;
     std::optional<T>   VRAM;
 public:
+
     template<typename ...Arg>
     Section(Arg && ...arg){
         dowm_func=[arg...](){return J(arg...);};
