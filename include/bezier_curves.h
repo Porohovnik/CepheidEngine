@@ -13,6 +13,15 @@ bool operator==(glm::vec3 p0, glm::vec3 p1){
     return ((std::abs(p0.x-p1.x)<=0.001f) && (std::abs(p0.y-p1.y)<=0.001f) && (std::abs(p0.z-p1.z)<=0.001f));
 }
 
+bool isstraight_line(glm::vec3 & p_begin, glm::vec3 &p_end, glm::vec3 &p_test){
+    return std::abs((p_test.x - p_begin.x) / (p_end.x - p_begin.x) - (p_test.y - p_begin.y) / (p_end.y - p_begin.y)) <= 0.0001f;
+}
+
+template <typename ...Arg>
+bool isStraight_line(glm::vec3 & p_begin, glm::vec3 &p_end, Arg & ... p_test){
+    return (isstraight_line(p_begin,p_end,p_test) &&...);
+}
+
 static void cubicBez(glm::vec3 p0, glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,float tol,std::list<glm::vec3> & mesh_data){
 
         //прямая линия значит, а финальную точку всё равно добавит внешний интерфейс
@@ -20,6 +29,11 @@ static void cubicBez(glm::vec3 p0, glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,float 
             mesh_data.emplace_back(p0);
             return;
         }
+        if(isStraight_line(p0,p3,p1,p2)){
+            mesh_data.emplace_back(p0);
+            return;
+        }
+
 
         glm::vec3 a=3.0f*p1-2.0f*p0-p3;
         glm::vec3 b=3.0f*p2-p0-2.0f*p3;
@@ -29,8 +43,12 @@ static void cubicBez(glm::vec3 p0, glm::vec3 p1,glm::vec3 p2,glm::vec3 p3,float 
         //проверка на возможность апроксимации линеей
         if(t<=tol){
             mesh_data.emplace_back(p0);
-            mesh_data.emplace_back(p1);
-            mesh_data.emplace_back(p2);
+            if(!(p0==p1)){
+               mesh_data.emplace_back(p1);
+            }
+            if(!(p1==p2) && !(p2==p3)){
+               mesh_data.emplace_back(p2);
+            }
             return;
         }
 

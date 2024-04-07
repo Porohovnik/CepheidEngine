@@ -18,21 +18,24 @@ SVG::SVG(std::filesystem::path path){
 
     //загрузка информации
     for (auto shape = image->shapes; shape != nullptr; shape = shape->next) {
-        objects.emplace_back(shape->fill.color,shape->id);
+        objects.emplace_back(Color(shape->fill.color,Color::Revers{}),shape->id);
+        //std::cout<<"|||||||||" << std::hex<<shape->fill.color<<std::endl;
+
         for (auto path = shape->paths; path != nullptr; path = path->next) {
+            objects.back().bezie_curves_data.emplace_back();
+
             for (std::size_t i = 0; i < path->npts-1; i += 3) {
                 float* p = &path->pts[i*2];
-
-                float sum =std::abs(p[0]-p[2])+std::abs(p[2]-p[4])+std::abs(p[4]-p[6])+std::abs(p[6]-p[0])+
-                           std::abs(p[1]-p[3])+std::abs(p[3]-p[5])+std::abs(p[5]-p[7])+std::abs(p[7]-p[1]);
+                float sum = std::abs(p[0]-p[2])+std::abs(p[2]-p[4])+std::abs(p[4]-p[6])+std::abs(p[6]-p[0])+
+                            std::abs(p[1]-p[3])+std::abs(p[3]-p[5])+std::abs(p[5]-p[7])+std::abs(p[7]-p[1]);
 
                 if(sum<0.01f){
                     std::cout<<sum<<std::endl;
                 }else {
-                    objects.back().bezie_curves_data.emplace_back(CubicBez_points{glm::vec3{p[0],p[1],0.0f},
-                                                                                  glm::vec3{p[2],p[3],0.0f},
-                                                                                  glm::vec3{p[4],p[5],0.0f},
-                                                                                  glm::vec3{p[6],p[7],0.0f}});
+                    objects.back().bezie_curves_data.back().emplace_back(CubicBez_points{glm::vec3{p[0],p[1],0.0f},
+                                                                                         glm::vec3{p[2],p[3],0.0f},
+                                                                                         glm::vec3{p[4],p[5],0.0f},
+                                                                                         glm::vec3{p[6],p[7],0.0f}});
                 }
             }
         }

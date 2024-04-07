@@ -16,6 +16,17 @@ public:
     float b=0.0f;
     float a=0.0f;
 
+    class Revers{};
+
+    Color(uint32_t hex_,Revers){
+        convector.hex=hex_;
+        //std::cout<<hex_<<"COOOOOOOOOOOOOOLOR"<<static_cast<int>(convector.rgba[RGBA::R])/256.0f<<"|"<<static_cast<int>(convector.rgba[RGBA::G])/256.0f<<"|"<<static_cast<int>(convector.rgba[RGBA::B])/256.0f<<"|"<<static_cast<int>(convector.rgba[RGBA::A])/256.0f<<std::endl;
+        r=static_cast<int>(convector.rgba[RGBA::R])/256.0f;
+        g=static_cast<int>(convector.rgba[RGBA::G])/256.0f;
+        b=static_cast<int>(convector.rgba[RGBA::B])/256.0f;
+        a=static_cast<int>(convector.rgba[RGBA::A])/256.0f;
+    }
+
     Color(uint32_t hex_){
         convector.hex=hex_;
         //std::cout<<hex_<<"COOOOOOOOOOOOOOLOR"<<static_cast<int>(convector.rgba[RGBA::R])/256.0f<<"|"<<static_cast<int>(convector.rgba[RGBA::G])/256.0f<<"|"<<static_cast<int>(convector.rgba[RGBA::B])/256.0f<<"|"<<static_cast<int>(convector.rgba[RGBA::A])/256.0f<<std::endl;

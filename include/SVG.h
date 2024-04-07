@@ -16,12 +16,14 @@ class SVG{
         glm::vec3 p3;
     };
 
+    using  ContourSVG=std::vector<CubicBez_points>;
+
     struct Object_SVG{
-        std::vector<CubicBez_points> bezie_curves_data;
-        uint32_t  color;
+        std::vector<ContourSVG> bezie_curves_data;
+        Color  color;
         std::string id;
 
-        Object_SVG(uint32_t  color_, std::string id_):color(color_),id(id_){}
+        Object_SVG(Color  color_, std::string id_):color(color_),id(id_){}
     };
 
 public:

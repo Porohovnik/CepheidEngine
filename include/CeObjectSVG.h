@@ -11,7 +11,7 @@
 namespace CeEngine {
 class CeObjectSVG: public CeObject{
     std::list<CePlate> shapes;
-    inline static std::size_t id_global_mesh=0;
+
 public:
     struct Data_initialization{
         std::filesystem::path path;
@@ -22,60 +22,94 @@ public:
     };
 
 
+    struct DataObject_2d{
+        inline static std::size_t id_global_mesh=0;
+
+        Color color;
+        std::shared_ptr<Mesh_data> data;
+        glm::vec2 minmax_x;
+        glm::vec2 minmax_y;
+        Position pos{1.0f};
+
+        operator CePlate::Data(){
+            return CePlate::Data{data,std::to_string(id_global_mesh++)+"_SVG",color,pos};
+        }
+    };
+
+
     template<typename Engine>
     CeObjectSVG(Engine *win_,typename Engine::List * celist_,Data_initialization data){
         SVG svg{data.path};
 
-        for (auto &T:svg.objects) {
+        std::vector<DataObject_2d> data_2d;
+
+        glm::vec2 minmax_x_all={100000000.0f,-100000000.0f};
+        glm::vec2 minmax_y_all={100000000.0f,-100000000.0f};
+
+        for (auto &SVG_shape:svg.objects) {
             std::cout<<"******************************************"<<std::endl;
             std::list<glm::vec3> data_point;
             std::vector<std::pair<uint,uint>> contour;
 
-            glm::vec3 begin;
-            bool t=true;
             uint begin_=0;
-            for (auto &J:T.bezie_curves_data) {
-                cubicBez(J.p0,J.p1,J.p2,J.p3,0.1f,data_point);
-                std::cout<<J.p0[0]<<":"<<J.p0[1]<<"|"<<J.p1[0]<<":"<<J.p1[1]<<"|"<<J.p2[0]<<":"<<J.p2[1]<<"|"<<J.p3[0]<<":"<<J.p3[1]<<std::endl;
-                if(t){
-                    begin=J.p0;
-                    t=false;
+            for (auto &Data:SVG_shape.bezie_curves_data) {
+                for (auto &Counter:Data) {
+                    cubicBez(Counter.p0,Counter.p1,Counter.p2,Counter.p3,2.0f,data_point);
+                    //std::cout<<Counter.p0[0]<<":"<<Counter.p0[1]<<"|"<<Counter.p1[0]<<":"<<Counter.p1[1]<<"|"<<Counter.p2[0]<<":"<<Counter.p2[1]<<"|"<<Counter.p3[0]<<":"<<Counter.p3[1]<<std::endl;
                 }
-                if(( std::abs(begin.x-J.p3.x )+std::abs(begin.y-J.p3.y ))<=0.001f){//исправить равно
-                    t=true;
-                    contour.emplace_back(begin_,data_point.size()-1);
-                    begin_=data_point.size();
-                    std::cout<<" =================================="<<std::endl;
-                }
+
+                contour.emplace_back(begin_,data_point.size()-1);
+                begin_=data_point.size();
+                std::cout<<" =================================="<<std::endl;
             }
-
-
-            for(auto &T:data_point){
-                std::cout<<T.x<<"|"<<T.y<<std::endl;
-            }
-
 
             std::vector<float> data_tex(data_point.size()*2,0.0f);
+            for(auto &Data:data_point){
+                Data.y=-Data.y;
+                //data_mesh->vertex[i]=-data_mesh->vertex[i];
+                //data_mesh->vertex[i+1]=-data_mesh->vertex[i+1];
+            }
+
 
             auto data_mesh=std::make_shared<Mesh_data>(data_point,contour,data_tex,5);
             data_mesh->set_marking_vertices<GL_layer::TYPE_data::position>(3);            
             data_mesh->set_marking_texture <0>(2);
 
-            //std::cout<<" =================================="<<std::endl;
-            for(std::size_t i=0;i<data_mesh->indexes.size();i+=3){
-                //std::cout<<data_mesh->indexes[i]<<", "<<data_mesh->indexes[i+1]<<", "<<data_mesh->indexes[i+2]<<", ";
-            }
-           // std::cout<<std::endl;
             auto minmax_array=data_mesh->normalaize<GL_layer::TYPE_data::position>();
 
-           // std::cout<<" =================================="<<std::endl;
             for(std::size_t i=0;i<data_mesh->vertex.size();i+=5){
-                data_mesh->vertex[i]=-data_mesh->vertex[i];
-                //std::cout<<data_mesh->vertex[i]<<", "<<data_mesh->vertex[i+1]<<", "<<data_mesh->vertex[i+2]<<", "<<data_mesh->vertex[i+3]<<", "<<data_mesh->vertex[i+4]<<", "<<std::endl;
+                //data_mesh->vertex[i]=-data_mesh->vertex[i];
+                //data_mesh->vertex[i+1]=-data_mesh->vertex[i+1];
             }
-            shapes.emplace_back(celist_,CePlate::Data{data_mesh,std::to_string(id_global_mesh++)+"_SVG",Color{0.0f, 0.0f, 0.0f, 1.0f},Position{1.0f}});
-            //std::to_string(id_global_mesh++)+"_SVG"
+            minmax_x_all[0]=std::min(minmax_array[0][0],minmax_x_all[0]);
+            minmax_y_all[0]=std::min(minmax_array[1][0],minmax_y_all[0]);
+
+            minmax_x_all[1]=std::max(minmax_array[0][1],minmax_x_all[1]);
+            minmax_y_all[1]=std::max(minmax_array[1][1],minmax_y_all[1]);
+
+            std::cout<<"min : "<<minmax_array[0][0]<<"|"<<minmax_array[1][0]<<std::endl;
+            std::cout<<"max : "<<minmax_array[0][1]<<"|"<<minmax_array[1][1]<<std::endl;
+            data_2d.emplace_back(DataObject_2d{SVG_shape.color,data_mesh,minmax_array[0],minmax_array[1],Position{1.0f}});
         }
+        std::cout<<"min_all : "<<minmax_x_all[0]<<"|"<<minmax_y_all[0]<<std::endl;
+        std::cout<<"max_all : "<<minmax_x_all[1]<<"|"<<minmax_y_all[1]<<std::endl;
+
+        float lenght_all_x=std::abs(minmax_x_all[1]-minmax_x_all[0]);
+        float lenght_all_y=std::abs(minmax_y_all[1]-minmax_y_all[0]);
+
+        for (auto &Data:data_2d) {
+
+            Data.pos.new_scale(glm::vec3{(Data.minmax_x[1]-Data.minmax_x[0])/lenght_all_x,
+                                         (Data.minmax_y[1]-Data.minmax_y[0])/lenght_all_y,
+                                         1.0f});
+
+            Data.pos.new_move(glm::vec3{(Data.minmax_x[0]-minmax_x_all[0])/(lenght_all_x)-0.5f,
+                                        (Data.minmax_y[0]-minmax_y_all[0])/(lenght_all_y)-0.5f,
+                                        0.0f});
+
+            shapes.emplace_back(celist_,Data);
+        }
+
     }
 
     void placement_of_elements(){}

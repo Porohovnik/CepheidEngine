@@ -3,6 +3,8 @@
 #include <vector>
 #include <list>
 #include "glm/vec3.hpp"
+#include "glm/vec2.hpp"
+
 
 #include "Mesh_info.h"
 namespace CeEngine {
@@ -10,8 +12,6 @@ typedef unsigned int uint;
 class Mesh_data{
     GL_layer::Mesh_info info;
 
-    using Max=float;
-    using Min=float;
 public:
     std::vector<float>  vertex;
     std::vector<uint>   indexes;
@@ -30,7 +30,7 @@ public:
         return info;
     }
 
-    std::vector<std::pair<Min,Max>> normalaize(unsigned int begin_offset, unsigned int end_offset);
+    std::vector<glm::vec2> normalaize(unsigned int begin_offset, unsigned int end_offset);
 
     template<GL_layer::TYPE_data type>
     auto normalaize(){
@@ -39,7 +39,7 @@ public:
             begin_offset+=info.get(type);//придумать что-то элегантное
         }
 
-        return normalaize(begin_offset,info.get<type>());
+        return normalaize(begin_offset,begin_offset+info.get<type>());
     }
 
     Mesh_data(std::list<glm::vec3> & point_data,std::vector<std::pair<uint,uint>> edges, std::vector<float> data_outher={},int data_step=3);

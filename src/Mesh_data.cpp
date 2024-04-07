@@ -6,39 +6,27 @@
 
 #include <iostream>
 
-
 namespace CeEngine {
-std::vector<std::pair<Mesh_data::Min,Mesh_data::Max>> Mesh_data::normalaize(unsigned int begin_offset,unsigned int end_offset){
-    std::vector<std::pair<Min,Max>> parametr_cord_min_max(end_offset-begin_offset);
+std::vector<glm::vec2> Mesh_data::normalaize(unsigned int begin_offset,unsigned int end_offset){
+    std::vector<glm::vec2> parametr_cord_min_max(end_offset-begin_offset);
 
     //    double diagonal_qrt=0;
     for (std::size_t i=begin_offset;i<end_offset;i++) {
         auto [min, max]=std::minmax_element(Interator_different_steps(vertex.begin()+i,  info.get_offset()),
                                             Interator_different_steps(vertex.end()+i,    info.get_offset()));
 
+        parametr_cord_min_max[i][0]=*min;
+        parametr_cord_min_max[i][1]=*max;
 
         if(std::abs(*max-*min)>0.00001f){
             std::for_each(Interator_different_steps(vertex.begin()+i,  info.get_offset()),
                           Interator_different_steps(vertex.end()+i,    info.get_offset()),
                           [min_=*min,max_=*max](auto &t){
-                          t=-(t-min_)/std::abs(max_-min_)+0.5f;//приведение к еденичному размеру и центровка
+                          t=(t-min_)/std::abs(max_-min_);//приведение к еденичному размеру и центровка
             });
         }
-
-        parametr_cord_min_max[i].first=*min;
-        parametr_cord_min_max[i].second=*max;
-        //diagonal_qrt+=std::pow(*max-*min,2);
     }
 
- //    double diagonal=std::sqrt(diagonal_qrt);
-
-//    for (std::size_t i=begin_offset;i<end_offset;i++) {
-//        std::for_each(Interator_different_steps(vertex.begin()+i,  info.get_offset()),
-//                      Interator_different_steps(vertex.end()+i,    info.get_offset()),
-//                      [parametr_cord_min_max,i,diagonal](auto &t){
-//                      t=(t-parametr_cord_min_max[i][0])/diagonal;
-//        });
-//    }
     return parametr_cord_min_max;
 };
 

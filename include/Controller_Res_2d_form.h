@@ -69,6 +69,7 @@ struct Material_RI{
 struct Command_draw_info_RI{
     int  firstIndex=0;
     int  count=0;
+    int  baseVertex=0;
 };
 
 #include "buffer_gl.h"
@@ -191,28 +192,33 @@ public:
             }
 
             Command_draw_info_RI cdi;
-            int first_vert=static_cast<int>(this->template get_element_data_GL<std::vector<float>>()->get_begin_of_controller(mesh_data->vertex.size()));
+            cdi.baseVertex =static_cast<int>(this->template get_element_data_GL<std::vector<float>>()->get_begin_of_controller(mesh_data->vertex.size()));
             cdi.firstIndex=static_cast<int>(this->template get_element_data_GL<std::vector<uint>>()->get_begin_of_controller(mesh_data->indexes.size()));
             cdi.count=static_cast<int>(mesh_data->indexes.size());
+
 
             this-> template add_element<std::shared_ptr<Buffer_mesh_controller_S>>(id,data.type_mesh,
                 std::tuple( this-> template get_element<std::shared_ptr<VAO_S>>(),//хммм
                             this-> template get_element_data_GL<std::vector<float>>(),
-                            first_vert,
+                            cdi.baseVertex,
                             this-> template get_element_data_GL<std::vector<uint>>(),
                             cdi.firstIndex)
                 ,mesh_data);
 
             id_mesh=(*this-> template get_element<std::shared_ptr<Buffer_mesh_controller_S>>(id))->get_id();
+
+            cdi.baseVertex=cdi.baseVertex/5;//каждая вершина имеет размер в 5 float
             this-> template add_element<Command_draw_info_RI>(id_mesh,cdi);
+
+            //std::cout<<id<<"%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&%%"<<id_mesh<<"__"<<cdi.baseVertex<<":"<< cdi.count<<"|"<<cdi.firstIndex<<std::endl;
         }
 
         GL_layer::DrawElementsIndirectCommand_menedger cmd_m;
 
         cmd_m.cmd.count= this-> template get_element<Command_draw_info_RI>(id_mesh)->count;
         cmd_m.cmd.firstIndex= this-> template get_element<Command_draw_info_RI>(id_mesh)->firstIndex;
-        cmd_m.cmd.baseVertex=0;//прошлое число вершин;
-        std::cout<<id_mesh<<":"<< cmd_m.cmd.count<<"|"<<cmd_m.cmd.firstIndex<<std::endl;
+        cmd_m.cmd.baseVertex=this-> template get_element<Command_draw_info_RI>(id_mesh)->baseVertex;
+        std::cout<<id_mesh<<"__"<<cmd_m.cmd.baseVertex<<":"<< cmd_m.cmd.count<<"|"<<cmd_m.cmd.firstIndex<<std::endl;
 
         this-> template add_element<Position>(id,data.pos);
         this-> template add_element<Material_RI>(id,Material_RI{id_global++,id_map_bd,data.color});
