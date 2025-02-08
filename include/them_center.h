@@ -1,6 +1,5 @@
 #ifndef THEM_CENTER_H
 #define THEM_CENTER_H
-
 #include <filesystem>
 #include <string>
 #include <unordered_map>
@@ -8,7 +7,7 @@
 #include "color.h"
 #include "tuple_utl.h"
 
-
+namespace CeEngine {
 template<typename Them_object_base>
 class Sub_Theme{
     std::unordered_map<std::string,Them_object_base> setting;                                       //базовые(из примитивов) объекты
@@ -29,8 +28,6 @@ public:
 private:
     std::unordered_map<std::string,Theme<Them_object_base_base>> theme;
 public:
-
-
 
 };
 namespace  Enum_them{
@@ -76,7 +73,6 @@ using Them_centre_=Theme_center<
     tutl::KAAT<Enum_them::font_name       ,Condition_argument<std::filesystem::path>>,
     tutl::KAAT<Enum_them::image_background,Condition_argument<std::filesystem::path>>
 >;
+}// namespace CeEngine
 
 #endif // THEM_CENTER_H
-
-

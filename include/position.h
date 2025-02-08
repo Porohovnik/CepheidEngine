@@ -1,53 +1,15 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include <glm/vec4.hpp> // glm::vec4
+#include <glm/vec3.hpp> // glm::vec4
 #include <glm/mat4x4.hpp> // glm::mat4
 #include <glm/ext/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale
 #include <glm/ext/matrix_clip_space.hpp> // glm::perspective
-#include <utility>
-#include <vector>
 
 //enum POINT_ATTACH{TOP,BOTTOM,RIGHT,LEFT};
+
 #include <iostream>
-
-
-class Pos{
-    glm::vec3 position   {1.0f};
-    glm::vec3 dimensions {1.0f};
-    
-    glm::vec4 quaternion {1.0f};
-
-    const Pos * view=nullptr;
-    glm::mat4 * projection=nullptr;
-
-    inline glm::mat4 pos() const{
-        glm::mat4 mat_{1.0f};
-
-        mat_[0][0]=dimensions[0];
-        mat_[1][1]=dimensions[1];
-        mat_[2][2]=dimensions[2];
-
-        mat_[3][0]=position[0];
-        mat_[3][1]=position[1];
-        mat_[3][2]=position[2];
-
-        if(projection && view){
-            return *projection*view->pos();
-        }
-        if(view){
-            return view->pos();
-        }
-        if(projection){
-            return *projection;
-        }
-        return mat_;
-    }
-};
-
-
-
-#include <unordered_map>
+namespace CeEngine{
 class  Position{
 
     using Weight=std::size_t;
@@ -61,7 +23,7 @@ class  Position{
     //метод соединения первая вставка и следующие
 
     glm::vec3 position_world{0.0f};
-    
+
     glm::vec3 scale_object{1.0f};
     glm::mat4 current_rote{1.0f};
 
@@ -193,5 +155,5 @@ public:
     }
 
 };
-
+}// namespace CeEngine
 #endif // POSITION_H

@@ -6,25 +6,21 @@
 #include <unordered_map>
 
 #include "context.h"
-#include "ceplagin_engine.h"
-
-template<class Object_,
-         typename Memory,
-         template<typename K, uint  L> class Buffer,
-         template<typename M,template<typename T__,uint n__> class B> class Context_storage,
-         template<typename M,template<typename T_,uint n_> class B> class ...Storage>
+#include "CePlagin_menedger.h"
+namespace CeEngine {
+template<class Object_, class Context_storage, class ...Storage>
 class Milieu{
 public:
-    using Context=Context<Object_,Context_storage<Memory,Buffer>, Storage<Memory,Buffer>...>;
+    using Context=Context<Object_,Context_storage, Storage...>;
 private:
     std::unordered_map<std::string,Context> contexts;
 public:
-    CePlagin_menedger plagin_menedger;
+    CePlagin_menedger plugin_menedger;
 
     Milieu(){
         std::system("chcp");//хак 1 - utf8
         // Init GLFW
-        if(glfwInit()){
+        if(Win_layer::Win::GLFW_Init()){
             std::cout << "Starting GLFW context, OpenGL "<< std::endl;
         };
 
@@ -48,7 +44,7 @@ public:
         }
     }
 
-    Context * insert_context(std::string name, int WIDTH, int HEIGHT, glm::vec4 background_color){
+    Context * insert_context(std::string name, int WIDTH, int HEIGHT, Color background_color){
         return &(contexts.try_emplace(name,name,WIDTH,HEIGHT,background_color).first->second);
     }
 
@@ -60,7 +56,7 @@ public:
         for (bool job=1;job;) {
             job=false;
             for(auto &[K,C]:contexts){
-                if(C.isOpen()){
+                if(C.isOpen()){//Win
                    C.new_fraem();
                    job=true;
                 }
@@ -69,5 +65,5 @@ public:
         std::cout<<"|exit"<<std::endl;
     }
 };
-
+}// namespace CeEngine
 #endif // MILIEU_H

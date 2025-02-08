@@ -1,55 +1,66 @@
 #ifndef IMAGE_H
 #define IMAGE_H
-#include <string>
 #include <memory>
 #include <filesystem>
-#include <vector>
 
-#include "color.h"
-#include "interlayer_gl.h"
-
-enum TYPE_TEXTURE {
-    Map_diffusion,
-    Map_normals,
-    Map_reflection,
-    Map_height,
-    Map_cub,
-    Map_font,
-    Map_atlas,
-    No_map
-};
+#include "GL_type_to_cpp.h"
+#include "Atribute_texture.h"
 
 
+namespace CeEngine {
 class Image{
 public:
-    Image(){}
-    GL_layer::Type_filter filter_atribute{};
+    using Width=GL_layer::GLsizei;
+    using Height=GL_layer::GLsizei;
 
-    std::shared_ptr<unsigned char[]> image=nullptr;
-    int  widths=0;
-    int  heights=0;
-    int  n=0;
-    int  deep=0;
+    struct Setting_image{
+        GL_layer::Type_filter_atribute_texture filter_atribute;
 
-    TYPE_TEXTURE type=Map_diffusion;
-    int pixel_size=1;
-    int type_pixel_grid=GL_RGBA;
-    bool mipmap=false;
+        std::size_t cout_image=1;
+        bool mipmap=false;
+        GL_layer::SHEME_COLOR_GL type_scheme_pixel=GL_layer::SHEME_COLOR_GL::RGBA;
+        GL_layer::TYPE_TEXTURE POINT_TEX=GL_layer::TYPE_TEXTURE::TEXTURE_2D;
+    };
+protected:
+    Width  width=0;
+    Height height=0;
+    std::size_t pixel_size=4;
+    Setting_image setting;
+    std::shared_ptr<unsigned char[]> data=nullptr;
+public:
+    Image()=default;
+    Image(std::filesystem::path path_image);
+    Image( Width  width_,Height height_,std::size_t pixel_size_,Setting_image setting_,std::shared_ptr<unsigned char[]> data_):
+        width(width_),height(height_),pixel_size(pixel_size_),setting(setting_),data(data_){}
 
-    void fill(Color color_){//rgba
-        auto color=color_.get_color()*256.0f;
-        image=std::shared_ptr<unsigned char[]>(new unsigned char[widths*heights*pixel_size]);
-        switch (pixel_size) {
-            case 1:for(std::size_t  i=0;i<widths*heights*pixel_size;i+=pixel_size){image.get()[i]=color.r;};break;
-            case 2:for(std::size_t  i=0;i<widths*heights*pixel_size;i+=pixel_size){image.get()[i]=color.r;image.get()[i+1]=color.g;};break;
-            case 3:for(std::size_t  i=0;i<widths*heights*pixel_size;i+=pixel_size){image.get()[i]=color.r;image.get()[i+1]=color.g,image.get()[i+2]=color.b;};break;
-            case 4:for(std::size_t  i=0;i<widths*heights*pixel_size;i+=pixel_size){image.get()[i]=color.r;image.get()[i+1]=color.g,image.get()[i+2]=color.b;image.get()[i+3]=color.a;};break;
-        }
+    void to_png(std::filesystem::path path_image);
+
+    GL_layer::TYPE_TEXTURE get_POINT_TEX() const{
+        return setting.POINT_TEX;
     }
+
+    Width get_width() const{
+        return width;
+    }
+    Height get_height() const{
+        return height;
+    }
+    std::size_t get_pixel_size() const{
+        return pixel_size;
+    }
+
+    const Setting_image & get_setting() const{
+        return setting;
+    }
+
+    auto * get_data() {
+        return &data;
+    }
+
+    auto & operator [](std::size_t i){
+        return data[i];
+    }
+
 };
-
-void  to_png(std::filesystem::path path_image,Image & im);
-Image load_image(std::filesystem::path path_image,TYPE_TEXTURE type=Map_diffusion);
-std::pair<Image, std::vector<glm::vec4>> create_atlas_image(std::vector<Image> & images, TYPE_TEXTURE type_map);
-
+}// namespace CeEngine
 #endif // IMAGE_H

@@ -1,22 +1,25 @@
 #ifndef RENDERING_ENGINE_H
 #define RENDERING_ENGINE_H
-
-#include <glm/vec4.hpp> // glm::vec3
-
 #include "tuple_utl.h"
 #include "draw_program.h"
-#include "information_rendering.h"
+#include "CeEnumeration.h"
+#include "Identification.h"
 
+#include <iostream>
+#include "interlayer_gl.h"
+namespace CeEngine {
 template<typename DRAW,typename TT>
 inline static void  rend(TT &data, std::size_t i,std::size_t size){
     using T=std::remove_reference_t<TT>;
     if constexpr(T::template check_type<DRAW>()){
-        if constexpr(T::type_draw() & TYPE_RENDERING_BIND_BUFFER){
+        std::cout<<"%%%%%%%%%%%%%%%% "<<GL_layer::Get_Error()<<std::endl;
+        if constexpr(T::type_draw() & GL_layer::TYPE_RENDERING_BIND_BUFFER){
             const DRAW * t=nullptr;
-            Draw<T::type_object(),T::type_draw()>(t,size);
+            GL_layer::Draw<T::type_object(),T::type_draw()>(t,size);
         }else{
-            Draw<T::type_object(),T::type_draw()>(data.template get_element<DRAW>(i),size);
+            GL_layer::Draw<T::type_object(),T::type_draw()>(data.template get_element<DRAW>(i),size);
         }
+        std::cout<<"%%%%%%%%%%%%%%%% "<<GL_layer::Get_Error()<<std::endl;
     }
 }
 
@@ -35,23 +38,17 @@ inline static void  rend_program(T &data){
                        TIME_BIND::LAST_SHOT_LAST_OBJECT,
                        TIME_BIND::LAST_SHOT>();
     auto size=data.get_element_size();
-    if constexpr(std::remove_reference_t<T>::template check_bind_time<TIME_BIND::FIRST_OBJECT,
-                 TIME_BIND::OBJECT,
-                 TIME_BIND::LAST_OBJECT>()){
+    if constexpr(std::remove_reference_t<T>::template check_bind_time<TIME_BIND::FIRST_OBJECT,TIME_BIND::OBJECT,TIME_BIND::LAST_OBJECT>()){
         for(std::size_t i=0;i<size;i++){
+            std::size_t id=i;
             if constexpr(std::remove_reference_t<T>::template check_type<Identification>()){
-                data.template bind<TIME_BIND::FIRST_OBJECT,
-                                   TIME_BIND::FIRST_SHOT_FIRST_OBJECT,
-                                   TIME_BIND::OBJECT,
-                                   TIME_BIND::FIRST_SHOT_LAST_OBJECT,
-                                   TIME_BIND::LAST_OBJECT>(data.template get_element<Identification>(i)->id);
-            }else {
-                data.template bind<TIME_BIND::FIRST_OBJECT,
-                                   TIME_BIND::FIRST_SHOT_FIRST_OBJECT,
-                                   TIME_BIND::OBJECT,
-                                   TIME_BIND::FIRST_SHOT_LAST_OBJECT,
-                                   TIME_BIND::LAST_OBJECT>(i);
+                id=data.template get_element<Identification>(i)->id;
             }
+            data.template bind<TIME_BIND::FIRST_OBJECT,
+                               TIME_BIND::FIRST_SHOT_FIRST_OBJECT,
+                               TIME_BIND::OBJECT,
+                               TIME_BIND::FIRST_SHOT_LAST_OBJECT,
+                               TIME_BIND::LAST_OBJECT>(id);
             std::cout<<"||||||||||||||||||||||rend|||||||||||||:"<<std::endl;
             ((rend<Arg>(data,i,1)),...);
         }
@@ -82,14 +79,11 @@ inline void rendering(RES * resourse){
         //static_assert (std::is_same<decltype(T),const List_rule>(),";l;");
         //тут присоедение по возможности фреймбуффера
     tutl::TupleForeach(resourse->Get_Data(),[](auto &t){
-        rend_program<decltype (t),DrawArraysIndirectCommand,DrawElementsIndirectCommand>(t);
+        rend_program<decltype (t),GL_layer::DrawArraysIndirectCommand,GL_layer::DrawElementsIndirectCommand>(t);
     });
 
-    //glFinish();
+    //GL_layer::Finish();
    //
 }
-
-
-
-
+}// namespace CeEngine
 #endif // RENDERING_ENGINE_H

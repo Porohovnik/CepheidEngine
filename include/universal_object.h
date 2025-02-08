@@ -22,6 +22,7 @@
 #include <charconv>
 #include <variant>
 
+#include "tuple_utl.h"
 inline float get_namber(char const * t,float base=0.0f){
     if(*t=='\0'){
         return base;
@@ -151,11 +152,6 @@ struct Setting_Object{
 };
 
 
-template<class... Ts>
-struct overloaded : Ts... { using Ts::operator()...; };
-// explicit deduction guide (not needed as of C++20)
-template<class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
 
 template<typename  ...Arg>
 class CeCollected_in_parts: public CeObject,public std::enable_shared_from_this<CeCollected_in_parts<Arg...>>{
@@ -223,7 +219,7 @@ public:
 
                 to_placment.push_back([ID_palcment,end,fun_pos,i_global](std::vector<Object> * objs){
                     for (std::size_t i=ID_palcment;i<end;i++) {
-                        std::visit(overloaded{
+                        std::visit(tutl::overloaded{
                             [&](CeCollected_in_parts<Arg...> & obj) { auto t = obj.change_position();
                                                                              auto pos=t.position;
                                                                              tutl::array_to_for(fun_pos,pos);},
@@ -248,7 +244,7 @@ public:
 
                 to_update.push_back([ID_palcment,end,fun_pos,i_global](std::vector<Object> * objs,const Position* pos_view){
                     for (std::size_t i=ID_palcment;i<end;i++) {
-                        std::visit(overloaded{
+                        std::visit(tutl::overloaded{
                             [&](CeCollected_in_parts<Arg...> & obj) { auto t = obj.change_position();
                                                                              auto pos=t.position;
                                                                              tutl::array_to_for(fun_pos,pos,pos_view);},
@@ -278,7 +274,7 @@ public:
                         }
                     }
                 for (std::size_t i=J.begin;i<J.end;i++){
-                    collection_object.emplace_back(win_->objects.template create_to_template_object<Engine,Arg...>(win_,celist_,Name,J.data));//а вот тут уже особенности
+                    collection_object.emplace_back(win_->objects.template create_to_template_object<Arg...>(win_,celist_,Name,J.data));//а вот тут уже особенности
                 }
                 i_global_s+=J.end-J.begin;
             }

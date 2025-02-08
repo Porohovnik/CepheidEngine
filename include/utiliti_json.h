@@ -5,8 +5,18 @@
 #include <functional>
 #include <string>
 
+#include <iostream>
+#include <list>
+//вынести в отдельный файл
+#include <glm/vec3.hpp> // glm::vec4
+#include "position.h"
 
-
+#include <incoming_signals_from_user.h>
+#include "Create_screenshot.h"
+#include "CePlagin_menedger.h"
+#include <tuple_utl.h>
+#include "celist.h"
+namespace CeEngine {
 
 template< typename T>
 inline bool get_to_check(nlohmann::json &j,std::string_view key,T &t){
@@ -51,18 +61,16 @@ void instal_array_fun_button(nlohmann::json &json,std::vector<F> array[], F fun)
     }
 }
 
-#include <iostream>
-
 template <typename Plagin_engine,typename Return,typename ...Arg>
-inline auto get_data_dll(Plagin_engine * plagin_engine, nlohmann::json &json){
+inline auto get_data_dll(Plagin_engine * plugin_engine, nlohmann::json &json){
     std::string name_shared_lib="";
     std::string name_fun="";
     get_to_check(json,"name_shared_lib",name_shared_lib);
     get_to_check(json,"name_fun",name_fun);
 
-    auto * plagin=plagin_engine->get_Shared_modul(name_shared_lib);
-    if(plagin!=nullptr){
-        auto t=plagin->template get_fun<Return,Arg...>(name_fun);
+    auto * plugin=plugin_engine->get_Shared_modul(name_shared_lib);
+    if(plugin!=nullptr){
+        auto t=plugin->template get_fun<Return,Arg...>(name_fun);
         std::cout<<name_shared_lib<<"#################"<<name_fun<<"|"<<(t.operator bool()==true)<<std::endl;
         return t;
     }else{
@@ -72,7 +80,7 @@ inline auto get_data_dll(Plagin_engine * plagin_engine, nlohmann::json &json){
 
 
 template <typename Plagin_engine,typename ...Arg>
-inline auto fun_in(Plagin_engine * plagin_engine,nlohmann::json &json){
+inline auto fun_in(Plagin_engine * plugin_engine,nlohmann::json &json){
     std::function<void(Arg...)> funs_get=nullptr;
     std::vector<std::function<void(Arg...)>> funs;
 
@@ -80,7 +88,7 @@ inline auto fun_in(Plagin_engine * plagin_engine,nlohmann::json &json){
         std::string type="";
         get_to_check(J,"type",type);
         if(type=="in_data"){
-            auto fun=get_data_dll<Plagin_engine,void,Arg...>(plagin_engine,J);
+            auto fun=get_data_dll<Plagin_engine,void,Arg...>(plugin_engine,J);
             if(fun!=nullptr){
                 funs.push_back(fun);
             }
@@ -97,7 +105,6 @@ inline auto fun_in(Plagin_engine * plagin_engine,nlohmann::json &json){
     return funs_get;
 }
 
-#include <list>
 
 
 template<size_t... i,typename F,typename ...Arg>
@@ -123,17 +130,17 @@ inline void fun_out_class(TT funs_out, F f,std::string id ,Ptr...ptr){
 
 
 
-#include <tuple_utl.h>
+
 
 template<typename Plagin_engine,typename F,typename ...Arg_1,typename ...Arg_2, size_t ...i>
-inline constexpr std::function<void(Arg_2...)> fun_out_(Plagin_engine * plagin_engine,nlohmann::json &json,F f, std::tuple<Arg_1...> * , std::tuple<Arg_2...> *,std::index_sequence<i...>){
+inline constexpr std::function<void(Arg_2...)> fun_out_(Plagin_engine * plugin_engine,nlohmann::json &json,F f, std::tuple<Arg_1...> * , std::tuple<Arg_2...> *,std::index_sequence<i...>){
     std::vector<std::function<void(std::function<void(Arg_1...)>,std::string)>>  funs_out;
 
     for(auto &[M,J]:json["funs_dll"].items()){
         std::string type="";
         get_to_check(J,"type",type);
         if(type=="out_data"){
-            auto fun=get_data_dll<Plagin_engine,void,std::function<void(Arg_1...)>,std::string>(plagin_engine,J);
+            auto fun=get_data_dll<Plagin_engine,void,std::function<void(Arg_1...)>,std::string>(plugin_engine,J);
             if(fun!=nullptr){
                 funs_out.push_back(fun);
             }
@@ -145,21 +152,13 @@ inline constexpr std::function<void(Arg_2...)> fun_out_(Plagin_engine * plagin_e
 
 
 template<std::size_t N,typename Plagin_engine,typename ...Arg>
-inline constexpr auto fun_out(Plagin_engine * plagin_engine,nlohmann::json &json, std::function<void(Arg...)> f){
-    return fun_out_(plagin_engine,json,f,tutl::Get_first_arguments<sizeof... (Arg)-N,Arg...>(),tutl::Get_last_arguments<N,Arg...>(),std::make_index_sequence<N>{});
+inline constexpr auto fun_out(Plagin_engine * plugin_engine,nlohmann::json &json, std::function<void(Arg...)> f){
+    return fun_out_(plugin_engine,json,f,tutl::Get_first_arguments<sizeof... (Arg)-N,Arg...>(),tutl::Get_last_arguments<N,Arg...>(),std::make_index_sequence<N>{});
 }
 
 
 
-//вынести в отдельный файл
-#include <glm/vec3.hpp> // glm::vec4
-#include "position.h"
-#include "utiliti_object_list_template.h"
-#include "ceplagin_engine.h"
-
-#include <incoming_signals_from_user.h>
-
-inline auto fun_screenshot(Incoming_signals_from_user *ISFU, nlohmann::json &json, CePlagin_menedger * plagin_engine){
+auto fun_screenshot(Win_layer::Incoming_signals_from_user *ISFU, nlohmann::json &json, CeEngine::CePlagin_menedger * plugin_engine){
     std::function<void(std::string)> funs_get=nullptr;
 
     std::string type="";
@@ -183,7 +182,7 @@ inline auto fun_screenshot(Incoming_signals_from_user *ISFU, nlohmann::json &jso
 
             std::function<std::string()> fun_path=nullptr;
             if(json["setting"]["path_setting"].size()){
-                fun_path=get_data_dll<CePlagin_menedger,std::string>(plagin_engine,json["setting"]["path_setting"]);
+                fun_path=get_data_dll<CeEngine::CePlagin_menedger,std::string>(plugin_engine,json["setting"]["path_setting"]);
             }
 
 
@@ -193,13 +192,13 @@ inline auto fun_screenshot(Incoming_signals_from_user *ISFU, nlohmann::json &jso
                     global_path/=fun_path();
                 }
 
-                glm::ivec3 v=     ISFU->otn_to_absolute_position(x,y);
-                glm::ivec3 v_size=ISFU->size_otn_to_absolute_position(width,height);
+                auto v=     ISFU->otn_to_absolute_position(x,y);
+                auto v_size=ISFU->size_otn_to_absolute_position(width,height);
 
                 std::cout<<v.x<<"|"<<v_size.x<<"|"<<v.y<<"|"<<v_size.y<<std::endl;
 
                 global_path/=path+".png";
-                create_screenshot<GL_RGB,GL_UNSIGNED_INT>(v.x,v_size.x,v.y,v_size.y,global_path);
+                CeEngine::create_screenshot(v.x,v_size.x,v.y,v_size.y,global_path);
                 std::cout<<"||"<<std::endl;
             };
 
@@ -310,8 +309,6 @@ inline auto fun_change_object(Object_engine *obj_eingine,nlohmann::json &json){
     return funs_get;
 }
 
-#include "celist.h"
-
 template <typename Resurse>
 inline auto fun_change_list_status(Resurse *resource,nlohmann::json &json){
     std::function<void(std::string)> funs_get=nullptr;
@@ -326,19 +323,19 @@ inline auto fun_change_list_status(Resurse *resource,nlohmann::json &json){
         std::string set_status="";
         get_to_check(json,"set_status",set_status);
 
-        Type_Status status;
+        CeEngine::Type_Status status;
 
         if(set_status=="CLEAR"){
-            status=Type_Status::CLEAR;
+            status=CeEngine::Type_Status::CLEAR;
         }
         if(set_status=="DISABLE"){
-            status=Type_Status::DISABLE;
+            status=CeEngine::Type_Status::DISABLE;
         }
         if(set_status=="NOVISEBLE"){
-            status=Type_Status::NOVISEBLE;
+            status=CeEngine::Type_Status::NOVISEBLE;
         }
         if(set_status=="VISEBLE"){
-            status=Type_Status::VISEBLE;
+            status=CeEngine::Type_Status::VISEBLE;
         }
 
         std::string type_button="lift";
@@ -361,13 +358,13 @@ inline auto fun_change_list_status(Resurse *resource,nlohmann::json &json){
 
 
 template<typename Object ,typename Plagin_engine,typename Engine>
-std::vector<std::shared_ptr<Object>> load_data_json(Plagin_engine * plagin_engine,Engine* win,nlohmann::json &j){
+std::vector<std::shared_ptr<Object>> load_data_json(Plagin_engine * plugin_engine,Engine* win,nlohmann::json &j){
     std::vector<std::shared_ptr<Object>> array_get;
      for(auto &[M,J]:j["list_object"].items()){
          //потом привязка к будущему
          std::vector<std::shared_ptr<Object>> array;
          if(J["list_object"].size()){
-             array=load_data_json<Object,Plagin_engine,Engine>(plagin_engine,win,J);
+             array=load_data_json<Object,Plagin_engine,Engine>(plugin_engine,win,J);
          }
 
          std::string type;
@@ -392,15 +389,15 @@ std::vector<std::shared_ptr<Object>> load_data_json(Plagin_engine * plagin_engin
          get_to_check(J,"scale_y",scale.y);
          get_to_check(J,"scale_z",scale.z);
 
-
+         std::cout<<name<<" | "<<M<<":: "<<type<<" ::"<<std::endl;
          auto celist=win->resource.get_list(list);
-         auto t=Engine::objects.create_object_to_json(name,type,win,celist,J,plagin_engine);
+         auto t=Engine::objects.create_object_to_json(name,type,win,celist,J,plugin_engine);
 
          auto ch=t->change_position();
          ch.position->move(move);
          ch.position->new_scale(scale);
 
-         //std::cout<<M<<":: "<<type<<" ::"<<std::endl;
+
          //сначала привязка к прошлому
          for(auto &T:array){
              t->add_element(T);
@@ -409,5 +406,5 @@ std::vector<std::shared_ptr<Object>> load_data_json(Plagin_engine * plagin_engin
      }
     return array_get;
 }
-
+} // namespace CeEngine
 #endif // UTILITI_JSON_H

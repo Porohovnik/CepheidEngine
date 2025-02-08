@@ -7,12 +7,13 @@
 #include "resource_engine.h"
 #include "object_engine.h"
 
-
 #include <chrono>
 #include <thread>
-
+namespace CeEngine {
 template<class Object,typename Context_storage,typename ...Storage>
-class Context:public Win{
+class Context:public Win_layer::Win{
+    bool isGLEW_true=false;
+
 public:
     inline static  Object_engine<Object>   objects{std::optional<Context>{}};//потом сделать иначе  //вообще плевать на окна
 
@@ -21,15 +22,13 @@ public:
 
     Signal_engine<Object>                 signal{};//косвенно зависит от окна(позволяет нереагировать на одинаковые клавиши из обоих окон)
 
-    Context(std::string name_okno_,int WIDTH, int HEIGHT,glm::vec4 background_color_):
-        Win(name_okno_,WIDTH,HEIGHT),resource(background_color_,&this->ISFU,0){}//нельзя ресурсы инцилизировать, до glewInit
-
-
+    Context(std::string name_okno_,int WIDTH, int HEIGHT,Color background_color_):
+        Win(name_okno_,WIDTH,HEIGHT),isGLEW_true(GL_layer::Init_GLEW()), resource(background_color_,&this->ISFU){}//нельзя ресурсы инцилизировать, до glewInit
 
     inline static void * current_context=nullptr;//так можно, ибо констекст это общая для вообще всего
-    void new_fraem(){ 
+    void new_fraem(){
         if(current_context!=this){
-            this->make_context();
+            this->make_context();//Win
         }
         current_context=this;
 
@@ -38,7 +37,7 @@ public:
         if(resource.Get_cout_call()){
             rendering(&resource);
             change_view_win=true;
-            this->swap_buffer();//
+            this->swap_buffer();//Win
             std::cout<<"44444444444"<<std::endl;
         }else {
             std::chrono::milliseconds timespan(16);
@@ -51,4 +50,5 @@ public:
         //std::cout<<"555555555555"<<std::endl;
     }
 };
+}// namespace CeEngine
 #endif // CONTEXT_H

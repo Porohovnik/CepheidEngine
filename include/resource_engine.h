@@ -1,13 +1,10 @@
 #ifndef RESOURCE_ENGINE_H
 #define RESOURCE_ENGINE_H
-
 #include <unordered_map>
-#include <iostream>
-#include <iterator>
 #include <memory>
-#include <glm/vec4.hpp> // glm::vec4
 
 #include "celist.h"
+namespace CeEngine {
 template <typename Context_storage, typename ...Storage>
 class Resource_engine{
 public:
@@ -95,14 +92,13 @@ public:
     }
 
 
-    template<typename Info_environment>
-    Resource_engine(glm::vec4 background_color_,Info_environment info_,std::size_t max_size):
-        resourse   (                  typename Storage        ::template Data<Info_environment>{nullptr,info_,0}...),
-        win_storage(background_color_,typename Context_storage::template Data<Info_environment>{nullptr,info_,0}){
+    template<typename Color ,typename Info_environment>
+    Resource_engine(Color background_color_,Info_environment * info_):
+        resourse   (tutl::repeater_fun<Storage>(info_)...),win_storage(background_color_,info_){
         tutl::TupleForeach(visible_object.get_data(),[](auto &t){t.data.emplace();});
-        std::cout<<"||0||"<<std::endl;
+        //std::cout<<"||0||"<<std::endl;
     }
 
 };
-
+}// namespace CeEngine
 #endif // RESOURCE_ENGINE_H

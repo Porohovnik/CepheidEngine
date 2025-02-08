@@ -1,14 +1,8 @@
 #ifndef SIGNAL_ENGINE_H
 #define SIGNAL_ENGINE_H
-
 #include <map>
 #include <set>
-#include <vector>
-#include <memory>
-#include "incoming_signals_from_user.h" //сделать шаблонным)
-
-class Setting_key;
-
+namespace CeEngine {
 template<typename Object>
 class Signal_engine{
     std::set<Object *> infiniti_fun;
@@ -16,8 +10,7 @@ class Signal_engine{
 
     std::map<int,Object *> key_fun;
 
-    std::map<int,std::shared_ptr<std::vector<Object *>>> id_fun;//расширить
-
+    std::multimap<int, Object *> id_fun;
     std::size_t  id_detector_before=0;
 public:
     Signal_engine(){}
@@ -28,11 +21,7 @@ public:
         }
 
         for(int id=min;id<=max;id++){
-            if(id_fun[id]==nullptr){
-                id_fun[id]=std::make_shared<std::vector<Object *>>(0);
-               // std::cout<<min<<":______:"<<max<<std::endl;
-            }
-            id_fun[id]->push_back(object);
+           id_fun.emplace(id,object);
         }
         return min;
     }
@@ -62,7 +51,8 @@ public:
     }
     //соединение с объектом на экране
 
-    void new_frame(Incoming_signals_from_user * ISFU){
+    template< typename Info_environment>
+    void new_frame(Info_environment * ISFU){
         for(auto &F:infiniti_fun){
             if(F!=nullptr){
                 (*F)(ISFU,typename Object::Infiniti());
@@ -78,32 +68,30 @@ public:
 
 
         auto t=[&](int id_detector,int id_detector_before,auto type){
-            if(id_fun[ISFU,id_detector_before]!=nullptr){
-                for(auto &T:*id_fun[id_detector_before]){
-                    if(T!=nullptr){
-                        int t=false;
-                        if(id_fun[id_detector]!=nullptr){
-                            for(auto &J:*id_fun[id_detector]){
-                                t+=(J==T);
-                            }
-                        }
-                        if(t){
-                            continue;
-                        }
-                        (*T)(ISFU,type);
+            auto range_bef = id_fun.equal_range(id_detector_before);
+            for (auto T = range_bef.first; T != range_bef.second; ++T){
+                if(T->second!=nullptr){
+                    int t=false;
+                    auto range = id_fun.equal_range(id_detector);
+                    for (auto J = range.first; J != range.second; ++J){
+                        t+=(J->second==T->second);
                     }
+                    if(t){
+                        continue;
+                    }
+                    (*(T->second))(ISFU,type);
                 }
             }
         };
 
 
-        if(id_fun[ISFU->id_detector]!=nullptr){
-            for(auto &T:*id_fun[ISFU->id_detector]){
-                if(T!=nullptr){
-                    (*T)(ISFU,typename Object::Interaction_Repetition_area());
-                }
+        auto range = id_fun.equal_range(ISFU->id_detector);
+        for (auto T = range.first; T != range.second; ++T){
+            if(T->second!=nullptr){
+                (*(T->second))(ISFU,typename Object::Interaction_Repetition_area());
             }
         }
+
 
         if(ISFU->id_detector!=id_detector_before){
             t(ISFU->id_detector,id_detector_before,typename Object::Exit_area());
@@ -123,6 +111,6 @@ public:
         }
     }
 };
-
+}// namespace CeEngine
 
 #endif // SIGNAL_ENGINE_H
