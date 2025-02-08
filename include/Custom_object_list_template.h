@@ -1,15 +1,11 @@
 #ifndef CUSTOM_OBJECT_LIST_TEMPLATE_H
 #define CUSTOM_OBJECT_LIST_TEMPLATE_H
-
+#include <Object_list_template.h>
+#include <utiliti_object_list_template.h>
 #include <string>
 #include <filesystem>
 #include <any>
 
-#include "ceobject.h"
-
-#include "CePlate.h"
-#include "CeText.h"
-namespace CeEngine {
 struct Data_Point_WorldMap{
    // Data_Bottom bottom_MC;
     float lon, lang=0;
@@ -25,15 +21,13 @@ struct Data_Point_WorldMap{
         path_font(path_font_),path_image(path_image_){
     }
 
-    operator CePlate::Data(){
-        return CePlate::Data{path_image};
+    operator Data_CePlate(){
+        return Data_CePlate{path_image};
     }
-    operator CeText::Data(){
-        return CeText::Data{path_font,name};
+    operator Data_CeText(){
+        return Data_CeText{path_font,name};
     }
 };
-
-#include "URL_curl.h"
 
 Type_curl API_rp5_ru(Data_Point_WorldMap data,int i=1){
     std::string https=" ";
@@ -149,7 +143,7 @@ Type_curl API_rp5_ru(Data_Point_WorldMap data,int i=1){
     return atribute;
 }
 
-#include "CeWorldMap.h"
+
 
 
 
@@ -167,8 +161,8 @@ public:
     template<typename Engine>
     CePoint_WorldMap(Engine *win_,typename Engine::List * celist_,typename CeObject::Data data_):
         data(std::any_cast<Data_Point_WorldMap>(data_)),
-        MC(celist_,std::any_cast<Data_Point_WorldMap>(data_).operator CePlate::Data()),
-        MC_name(celist_,std::any_cast<Data_Point_WorldMap>(data_).operator CeText::Data())   {
+        MC(celist_,std::any_cast<Data_Point_WorldMap>(data_).operator Data_CePlate()),
+        MC_name(celist_,std::any_cast<Data_Point_WorldMap>(data_).operator Data_CeText())   {
 
         fun_cursor=[win_](std::string s){
               win_->set_cursor(s);
@@ -176,15 +170,15 @@ public:
     }
 
 
-    virtual void operator()(Win_layer::Incoming_signals_from_user * ISFU,typename CeObject::Interaction_One_input_area){
+    virtual void operator()(Incoming_signals_from_user * ISFU,typename CeObject::Interaction_One_input_area){
        fun_cursor("STANDART_HAND");
     }
 
-    virtual void operator()(Win_layer::Incoming_signals_from_user * ISFU, typename CeObject::Exit_area){
+    virtual void operator()(Incoming_signals_from_user * ISFU, typename CeObject::Exit_area){
        fun_cursor("STANDART_ARROW");
     }
 
-    virtual void operator()(Win_layer::Incoming_signals_from_user * ISFU, typename CeObject::Interaction_Repetition_area){
+    virtual void operator()(Incoming_signals_from_user * ISFU, typename CeObject::Interaction_Repetition_area){
         if(ISFU->keys[GLFW_MOUSE_BUTTON_LEFT].action==1){
             ISFU->keys[GLFW_MOUSE_BUTTON_LEFT].action=0;
 
@@ -223,6 +217,6 @@ public:
 //struct Data_WorldMap{
 //    Data_CePlate plate;
 //};
-}// namespace CeEngine
+
 
 #endif // CUSTOM_OBJECT_LIST_TEMPLATE_H

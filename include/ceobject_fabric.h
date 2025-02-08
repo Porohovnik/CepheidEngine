@@ -2,7 +2,7 @@
 #define CEOBJECT_FABRIC_H
 #include <map>
 #include <functional>
-//В дополнения
+
 
 template<typename T,typename Key,typename ...Arg>
 class CeObject_fabric{

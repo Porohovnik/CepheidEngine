@@ -1,73 +1,89 @@
 #ifndef BUFFER_GL_H
 #define BUFFER_GL_H
-#include "Buffer_id.h"
-#include "GL_type_to_cpp.h"
-namespace  CeEngine{
-template<class T,GL_layer::BUFFER_SETTING type,GL_layer::TYPE_BUFFER n>
-class Buffer_GL{
-    inline static const GL_layer::GLintptr K=2;
+#include<GL/glew.h>
+#include <vector>
+#include "interlayer_gl.h"
 
-    GL_layer::Buffer_id<n> buffer;
-    GL_layer::GLsizeiptr size=0;
-    GL_layer::GLsizeiptr max_size=1;
+inline const int K=2;
+
+template<class T,GLenum n>
+class Buffer_GL{
+    GL_layer::Buffer_id<n> buffer=0;
+    std::size_t size=0;
+    std::size_t max_size=1;
+    int type=0;
+    int bind_base=-1;
 public:
-    inline std::size_t get_max_size()const noexcept{
+    std::size_t get_max_size(){
         return max_size;
     }
-    void expansion_buffer(GL_layer::GLsizeiptr new_max_size);
-    void expansion_not_save_data(GL_layer::GLsizeiptr new_max_size){
-        buffer.initialization_buffer_noBind(sizeof (T)*new_max_size, nullptr, type);
+    void expansion_buffer(std::size_t new_max_size);
+    void expansion_not_save_data(std::size_t new_max_size){
+        GL_layer::Bind_guard bind{buffer};
+        GL_layer::initialization_buffer<n>(sizeof (T)*new_max_size, nullptr, type);
         max_size=new_max_size;
-        //GL_layer::Finish();
+        glFinish();
     }
-    inline void clear() {
-         buffer.clear_buffer_noBind();
+    void clear(){
+         GL_layer::Bind_guard bind{buffer};
+         GLuint i=0;
+         GL_layer::clear_buffer<n>(&i);
+    }
+    Buffer_GL(){
+        buffer=GL_layer::create_buffer<n>();
+    }
+    Buffer_GL(int bind_base_,int type_,std::size_t max_size_,T * array=nullptr):
+    bind_base(bind_base_),type(type_),max_size(max_size_){
+        buffer=GL_layer::create_buffer<n>();
+        GL_layer::Bind_guard bind{buffer};
+        GL_layer::initialization_buffer<n>(sizeof (T)*max_size, array, type);
+    }
+    ~Buffer_GL(){
+        GL_layer::delete_buffer(buffer);
     }
 
-    Buffer_GL(const Buffer_GL& )=delete;
-    Buffer_GL(Buffer_GL&& )=delete;
-    Buffer_GL & operator=(Buffer_GL &&)=delete;
-    Buffer_GL & operator=(const Buffer_GL &)=delete;
+    Buffer_GL(Buffer_GL&& buffer):buffer(buffer.buffer),bind_base(buffer.bind_base),type(buffer.type),max_size(buffer.max_size),size(buffer.size){}
+    Buffer_GL(const Buffer_GL& buffer):buffer(buffer.buffer),bind_base(buffer.bind_base),type(buffer.type),max_size(buffer.max_size),size(buffer.size){}
 
-    Buffer_GL(const T * array=nullptr,GL_layer::GLsizeiptr max_size_=0):buffer(sizeof (T)*max_size_, array, type),max_size(max_size_){}
-
-    template<typename Array>
-    Buffer_GL(const Array &array):buffer(sizeof (T)*array.size(), array.data(), type),max_size(array.size()){}//для последоовательных контейнеров
-
-    inline bool insert(GL_layer::GLintptr id,const T * elements,GL_layer::GLsizeiptr size_insert=1,GL_layer::GLintptr offset=0){
-        return  changes(elements,id,id+size_insert,offset);
+    Buffer_GL & operator=(Buffer_GL && buffer_){
+        return buffer_;
+    }
+    Buffer_GL & operator=(const Buffer_GL & buffer_){
+        return buffer_;
     }
 
-    inline bool changes(const T * changes,GL_layer::GLintptr begin,GL_layer::GLintptr end,GL_layer::GLintptr offset=0){
+    inline int insert(std::size_t id,T * elements,int size_insert=1,int offset=0){
+        changes(elements,id,id+size_insert,offset);
+        return id;
+    }
+    inline bool changes(const T * changes,std::size_t begin,std::size_t end,std::size_t offset=0){
         if(end>size){
             size=end;
         }
         if(size>(max_size)){
             expansion_buffer(size+max_size*K);
         }
-        buffer.update_buffer_noBind(begin,end,sizeof(T),changes,offset);
+        GL_layer::Bind_guard bind(buffer);
+        GL_layer::update_buffer<n>(begin,end,sizeof(T),changes,offset);
         return true;
     }
-
-    void read_data(GL_layer::GLintptr begin,GL_layer::GLintptr end,T * elements) const{
-        buffer.read_buffer_noBind(begin,end,sizeof (T),elements);
+    void read_data(std::size_t begin,std::size_t end,std::vector<T> &data){//заменить на интераторы
+        if(data.size()<(end-begin)){
+            data.resize(end-begin);
+        }
+        GL_layer::read_buffer<n>(begin,end,sizeof (T),data.data());
     }
-
-    T read_data(GL_layer::GLintptr pos) const{
+    T read_data(std::size_t pos){
+        GL_layer::Bind_guard bind{buffer};
         T t=0;
-        buffer.read_buffer_noBind(pos,pos+1,sizeof (T),&t);
+
+        GL_layer::read_buffer<n>(pos,pos+1,sizeof (T),&t);
         return t;
     }
-
-    inline void Bind() const noexcept{
-        buffer.Bind_();
+    inline void Bind(int bind_base_=-1) const{
+        GL_layer::Bind_(buffer);
+        GL_layer::BindBase(buffer,bind_base_);
     }
-
-    inline void Bind(GL_layer::GLuint bind_base_) const noexcept{
-        buffer.Bind_();
-        buffer.BindBase(bind_base_);
-    }
-
 };
 ////////////////////
 ///
@@ -75,24 +91,21 @@ public:
 ///
 ///
 ///////////////////
-template<class T,GL_layer::BUFFER_SETTING type,GL_layer::TYPE_BUFFER n>
-void  Buffer_GL<T,type,n>::expansion_buffer(GL_layer::GLsizeiptr new_max_size){
+template<class T,GLenum n>
+void  Buffer_GL<T,n>::expansion_buffer(std::size_t new_max_size){
     //std::cout<<"/-expansion-/"<<new_max_size<<std::endl;
     //создание буффера большего объёма
-    GL_layer::Buffer_id<n> temporary_buffer{static_cast<GL_layer::GLsizeiptr>(sizeof (T)) *new_max_size, nullptr, type};//выделение места для нового буффера
-
-    buffer          .template Bind_set_point<GL_layer::TYPE_BUFFER::COPY_READ_BUFFER>(); //отсюда читаем
-    temporary_buffer.template Bind_set_point<GL_layer::TYPE_BUFFER::COPY_WRITE_BUFFER>();//сюда записываем
-
-    //перенос данных из буффера меньшего обёъма в новый
-    GL_layer::copy_buffer<GL_layer::TYPE_BUFFER::COPY_READ_BUFFER,GL_layer::TYPE_BUFFER::COPY_WRITE_BUFFER>(max_size*sizeof (T));
-
-    // std::cout<<GL_layer::Get_Error()<<"/-Buffer_GL-/"<< max_size<<"///::"<<new_max_size <<std::endl;
-    //новый  буффер большего размера теперь главный
-    //старый буффер должен сам умереть
-    buffer.swap(temporary_buffer);
+    auto temporary_buffer=GL_layer::create_buffer<n>();
+    GL_layer::Bind_guard<n> bind_1{temporary_buffer};
+    GL_layer::initialization_buffer<n>(sizeof (T)*new_max_size, nullptr, type);//выделение места для нового буффера
+    GL_layer::Bind_guard bind_2{GL_layer::Buffer_id<GL_COPY_READ_BUFFER>{buffer}};//так надо
+    //перенос данных из буфффера меньшего объма в новый
+    GL_layer::copy_buffer<GL_COPY_READ_BUFFER,n>(max_size*sizeof (T));
+    //удаления старого буффера
+    GL_layer::delete_buffer(buffer);
+    //новый буффер большего размера теперь главнный
+    buffer=temporary_buffer;
     max_size=new_max_size;
-    GL_layer::Finish();
+    glFinish();
 };
-}// namespace CeEngine
 #endif // BUFFER_GL_H

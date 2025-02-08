@@ -3,11 +3,37 @@
 #include "list"
 #include "tuple_utl.h"
 
-#include <Identification.h>
-#include <CeEnumeration.h>
-namespace CeEngine {
+#include <iostream>
+
+enum Type_Status:int {CLEAR=3,DISABLE=2,NOVISEBLE=1,VISEBLE=0};
+
+struct Identification{
+    int id=0;
+    template<typename  I>
+    Identification(I id_):id(id_){}
+    Identification(){}
+
+    template<typename  I>
+    operator I(){
+        return id;
+    }
+    template<typename  I>
+    bool operator ==(I i_){
+        return i_==id;
+    }
+    bool operator ==(Identification i_){
+        return i_.id==id;
+    }
+
+    inline int get_id() const{
+        return id;
+    }
+};
+
+//template <typename Memory,template<typename T,uint n> class Buffer,template<typename M,template<typename T_,uint n_> class B> class ...Storage>
 template <typename ...Storage>
 class CeList{
+    //tutl::Type_to_data<tutl::TAAT<Storage<Memory,Buffer>, std::list<Identification *>>...>   data_to_list;
     std::tuple<Storage *...> resourse_ptr;
     bool * change_status_vis;
 
@@ -15,7 +41,7 @@ class CeList{
     std::function<void()> delete_vis=nullptr;
 
     tutl::Type_to_data<tutl::TAAT<Storage, std::list<Identification *>>...>   data_to_list;
-    Type_Status status=Type_Status::DISABLE;
+    Type_Status status=Type_Status::DISABLE; 
 public:
     CeList(bool * change_status_vis_, decltype (add_vis) add_vis_,Storage * ...  storage):
         change_status_vis(change_status_vis_),add_vis(add_vis_),resourse_ptr(storage...){
@@ -28,11 +54,14 @@ public:
         }
     }
 
+    //template<template<typename M,template<typename T_,uint n_> class B>  class Type>
     template<typename  Type>
     constexpr Type * get_element(){
         return *tutl::Get_tuple_type_element_t<Type *>(resourse_ptr);
     }
 
+
+    //template<template<typename M,template<typename T_,uint n_> class B>  class Type>
     template<typename  Type>
     auto attach_object(Identification * object){
          return data_to_list.template get_element_data<Type>().insert(data_to_list.template get_element_data<Type>().end(),object);
@@ -53,7 +82,7 @@ public:
 
         if(new_status_==Type_Status::VISEBLE && add_vis!=nullptr){
             delete_vis=add_vis(&data_to_list);
-            //std::cout<<"|"<<std::endl;
+            std::cout<<"|"<<std::endl;
         }
 
         if(status==Type_Status::VISEBLE && delete_vis!=nullptr){//раз бывший статус - отображение, значит следующий точно другой
@@ -74,6 +103,7 @@ public:
     Type_Status get_status() const{
         return status;
     }
+
 };
-}// namespace CeEngine
+
 #endif // CELIST_H
