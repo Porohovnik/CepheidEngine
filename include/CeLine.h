@@ -9,7 +9,8 @@ constexpr char name_Line[]="CeLine";
 //    using CePrimitiv<name_Line,Material_L,Controller_Res_2d_line,nullptr>::CePrimitiv;
 //};
 
-using CeLine = CePrimitiv<name_Line,Material_L,Controller_Res_2d_line,nullptr>;
+using CeLine = CePrimitiv<name_Line,Material_L,Controller_Res_2d_line<false>,nullptr>;
+//using CeLine_xy = CePrimitiv<name_Line,Material_L,Controller_Res_2d_line<true>,nullptr>;
 }// namespace CeEngine
 
 #endif // CELINE_H

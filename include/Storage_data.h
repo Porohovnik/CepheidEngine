@@ -11,11 +11,9 @@
 #include "CeEnumeration.h"
 #include "GL_type_to_cpp.h"
 
-#include "Data_ABC.h"
 namespace CeEngine {
-template<typename Memory,GL_layer::TYPE_OBJECT_DRAW type_object_,int type_draw_,typename ...Arg>
+template<GL_layer::TYPE_OBJECT_DRAW type_object_,int type_draw_,typename ...Arg>
 class Storage_data{
-    Memory res;
     std::tuple<Arg...> data;
     std::set<std::size_t> list_to_delete;
 
@@ -28,13 +26,10 @@ public:
     static constexpr GL_layer::TYPE_OBJECT_DRAW type_object(){return type_object_;}
     static constexpr int type_draw(){return type_draw_;}
 
-
-    template< typename Info_environment>
-    Storage_data(Info_environment * info):data(tutl::repeater_fun<Arg>(Data_herald<Memory,Info_environment>{&res,info})...){
+    Storage_data():data(){
         std::cout<<"|:::"<<std::endl;
     }
 
-    Storage_data()=delete;
     ~Storage_data(){
         std::size_t l=list_to_delete.size()+size;
         std::cout<<list_to_delete.size()+size<<"|"<<list_to_delete.size()+size_visible<<std::endl;
@@ -52,7 +47,13 @@ public:
             }
         });
         std::cout<<list_to_delete.size()+size<<"1|"<<list_to_delete.size()+size_visible<<std::endl;
-        res.new_frame();
+        tutl::TupleForeach(data,[](auto &t){
+            if constexpr(std::remove_reference_t<decltype (t)>::type_container!=TYPE_CONTAINER::ONE){
+                if constexpr(std::remove_reference_t<decltype (t)>::type_res_== TYPE_RES_STORAGE::GLOBAL){
+                    t.new_frame();
+                }
+            }
+        });
         std::cout<<list_to_delete.size()+size<<"|"<<"ssssssssssssssssssssssss"<<std::endl;
     }
 
@@ -116,7 +117,6 @@ public:
 
     virtual bool new_frame_controller(){return  false;}
     bool new_frame(){
-        res.new_frame();
         std::size_t b=false;
         cout_call=change_size;
 
@@ -282,6 +282,13 @@ public:
         get->emplace(std::forward<Arg_>(arg_)...);
         return 0;
     }
+
+    template<typename Type,typename K>
+    bool isData_storage(K key){
+        auto get=tutl::Get_tuple_type_element<Type,std::tuple<decltype (Arg::Type())...>>(data);
+        return get->isData_storage(key);
+    }
+
     template<typename Type,typename ...Arg_>
     auto read_data(Arg_ ...arg_) const{
         auto get=tutl::Get_tuple_type_element<Type,std::tuple<decltype (Arg::Type())...>>(data);

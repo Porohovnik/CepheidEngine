@@ -31,7 +31,7 @@ public:
     void Bind(int base, int id=-1) const{
         Textur.active_texture(base);
         Textur.Bind_();
-        std::cout<<GL_layer::Get_Error()<<"/-Texture-/"<<id<<"///::"<<base<<std::endl;
+        //std::cout<<GL_layer::Get_Error()<<"/-Texture-/"<<id<<"///::"<<base<<std::endl;
     }
 };
 }// namespace CeEngine

@@ -7,7 +7,6 @@
 #include <interlayer_gl.h>
 namespace CeEngine {
 class Buffer_mesh_controller{
-
     std::function<void()> deleter=nullptr;
 public:
     template<typename VAO_, typename D_VBO, typename D_EBO,typename Mesh_data>
@@ -29,6 +28,10 @@ public:
         (*VAO__)->Get_VRAM().attach(VBO,EBO);
 
     }
+    inline void Bind(int base,int id){}
+
+    template<typename VAO_, typename D_VBO, typename D_EBO,typename Mesh_data>
+    static void default_value(VAO_ VAO__, D_VBO VBO,std::size_t VBO_mark_first ,D_EBO EBO,std::size_t EBO_mark_first ,int id_bd){}
 
     ~Buffer_mesh_controller(){
         if(deleter!=nullptr){

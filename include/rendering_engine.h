@@ -12,14 +12,15 @@ template<typename DRAW,typename TT>
 inline static void  rend(TT &data, std::size_t i,std::size_t size){
     using T=std::remove_reference_t<TT>;
     if constexpr(T::template check_type<DRAW>()){
-        std::cout<<"%%%%%%%%%%%%%%%% "<<GL_layer::Get_Error()<<std::endl;
+        //std::cout<<"%%%%%%%%%%%%%%%% "<<GL_layer::Get_Error()<<std::endl;
         if constexpr(T::type_draw() & GL_layer::TYPE_RENDERING_BIND_BUFFER){
             const DRAW * t=nullptr;
+
             GL_layer::Draw<T::type_object(),T::type_draw()>(t,size);
         }else{
             GL_layer::Draw<T::type_object(),T::type_draw()>(data.template get_element<DRAW>(i),size);
         }
-        std::cout<<"%%%%%%%%%%%%%%%% "<<GL_layer::Get_Error()<<std::endl;
+        //std::cout<<"%%%%%%%%%%%%%%%% "<<GL_layer::Get_Error()<<std::endl;
     }
 }
 
@@ -49,7 +50,7 @@ inline static void  rend_program(T &data){
                                TIME_BIND::OBJECT,
                                TIME_BIND::FIRST_SHOT_LAST_OBJECT,
                                TIME_BIND::LAST_OBJECT>(id);
-            std::cout<<"||||||||||||||||||||||rend|||||||||||||:"<<std::endl;
+            std::cout<<i<<"||||||||||||||||||||||rend|||||||||||||:"<<size<<std::endl;
             ((rend<Arg>(data,i,1)),...);
         }
     }else{

@@ -5,13 +5,11 @@
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
 
-
 #include "Mesh_info.h"
 namespace CeEngine {
 typedef unsigned int uint;
 class Mesh_data{
     GL_layer::Mesh_info info;
-
 public:
     std::vector<float>  vertex;
     std::vector<uint>   indexes;

@@ -22,11 +22,11 @@ public:
         GL_layer::TYPE_TEXTURE POINT_TEX=GL_layer::TYPE_TEXTURE::TEXTURE_2D;
     };
 protected:
-    Width  width=0;
-    Height height=0;
+    Width  width=1;
+    Height height=1;
     std::size_t pixel_size=4;
     Setting_image setting;
-    std::shared_ptr<unsigned char[]> data=nullptr;
+    std::shared_ptr<unsigned char[]> data=std::shared_ptr<unsigned char[]>(new unsigned char[4]);
 public:
     Image()=default;
     Image(std::filesystem::path path_image);

@@ -48,10 +48,10 @@ public:
 
 };
 
-template<typename Memory, typename Info_environment>
-struct Data_herald{
-    Memory *res;
-    Info_environment * info;
-};
+//template<typename Memory, typename Info_environment>
+//struct Data_herald{
+//    Memory *res;
+//    Info_environment * info;
+//};
 }// namespace CeEngine
 #endif // DATA_ABC_H

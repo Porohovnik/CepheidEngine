@@ -6,7 +6,7 @@
 
 #include "CeEnumeration.h"
 namespace CeEngine {
-template<TYPE_ORDER_UPDATE order,typename K,typename T>
+template<typename K,typename T>
 class Unit_res{
     struct Status_Section{
         K key;
@@ -34,8 +34,6 @@ class Unit_res{
 public:
     static K get_key();
     static std::shared_ptr<T> Type();
-
-    inline constexpr static TYPE_ORDER_UPDATE type_order_update = order;
 
     Unit_res(){}
 
@@ -100,6 +98,10 @@ public:
     }
 
     void add_task(std::shared_ptr<T> res,Type_Status status){//сделать это ассинхронным
+        if(res==nullptr){
+            return;
+        }
+
         if(tasks.find(res)==tasks.end()){
             tasks.try_emplace(res,Status_count{});
         }
@@ -109,7 +111,11 @@ public:
     }
 
 
-    void new_frame(){
+    bool new_frame(){
+        if(tasks.size()==0){
+            return false;
+        }
+
         for (auto &[TT,SS]:tasks) {//для ассинхронности разные о
             auto &current=status_data[TT];
             //std::cout<<TT<<"tasks_size: "<<"|"<<current.key<<"|<"<<SS[0]<<"|"<<SS[1]<<"|"<<SS[2]<<"|"<<SS[3]<<">|"<<data.size()<<std::endl;
@@ -117,6 +123,7 @@ public:
             process_task(TT,SS);
         }
         tasks.clear();
+        return  true;
     }
 };
 }// namespace CeEngine

@@ -13,7 +13,6 @@
 #include "Data_res_one.h"
 #include "Data_gl_array.h"
 
-#include "Storage_resource.h"
 #include "Unit_res.h"
 #include "Section.h"
 #include "Section_static.h"
@@ -39,14 +38,6 @@ using Font_S = Section_static<Data_font,Font_controller<Texture>>;
 using Buffer_mesh_S =Section<std::shared_ptr<Mesh_data>,Buffer_mesh>;
 using Shades_S =Section<GL_layer::GLSL_code_data,Program_GPU>;
 
-using Storage_res_text=Storage_resource<
-    //в первую очередь
-    Unit_res<TYPE_ORDER_UPDATE::FIRST,std::string,Shades_S>,
-    //когда угодно, после первой...
-    Unit_res<TYPE_ORDER_UPDATE::ANY  ,std::string,Font_S>,
-    Unit_res<TYPE_ORDER_UPDATE::ANY  ,std::string,Buffer_mesh_S>
->;
-
 
 #include "Identification.h"
 #include "position.h"
@@ -70,20 +61,18 @@ using Data_gl_I=Data_gl  <bind_time,bind_base,GL_layer::BUFFER_SETTING::STATIC,G
 template<TIME_BIND bind_time,int bind_base_aloc,int bind_base,typename T,typename J=typename T::value_type,J fun(T&)=nullptr,TRIVIAL_DELETE t_delete=TRIVIAL_DELETE::YES>
 using Data_gl_array_S=Data_gl_array<TIME_BIND::SHOT,  bind_base_aloc,     bind_base,GL_layer::BUFFER_SETTING::DYNAMIC ,GL_layer::TYPE_BUFFER::SHADER_STORAGE_BUFFER,CeEngine::Buffer_GL,T,J,fun,t_delete>;
 
-template<typename Memory>
 using Res_2d_text__=
 Storage_data<
-    Memory,
 #ifdef BINDLES_TEXTURE
     GL_layer::TYPE_OBJECT_DRAW::TYPE_OBJECT_TRIANGLES,
     GL_layer::TYPE_RENDERING_ELEMENT | GL_layer::TYPE_RENDERING_MYLTI | GL_layer::TYPE_RENDERING_INDERECT | GL_layer::TYPE_RENDERING_BIND_BUFFER,
     Data_gl_I      <TIME_BIND::SHOT, -1,GL_layer::DrawElementsIndirectCommand,GL_layer::DrawElementsIndirectCommand,nullptr,TRIVIAL_DELETE::NO>,
-    Data_res_one <TIME_BIND::FIRST_SHOT_LAST_OBJECT,                          Memory,std::shared_ptr<Shades_S>,-1>,
+    Data_res_one <TIME_BIND::FIRST_SHOT_LAST_OBJECT,Shades_S,-1>,
 #else
     GL_layer::TYPE_OBJECT_DRAW::TYPE_OBJECT_TRIANGLES,
     GL_layer::TYPE_RENDERING_ELEMENT | GL_layer::TYPE_RENDERING_INSTANSE,
     Data_gl_I      <TIME_BIND::NEVER,-1,       GL_layer::DrawElementsIndirectCommand,GL_layer::DrawElementsIndirectCommand,nullptr,TRIVIAL_DELETE::NO>,
-    Data_res_one <TIME_BIND::FIRST_SHOT_LAST_OBJECT,                          Memory,std::shared_ptr<Shades_S>,0>,
+    Data_res_one <TIME_BIND::FIRST_SHOT_LAST_OBJECT,Shades_S,0>,
 #endif
     Data_gl_I      <TIME_BIND::NEVER,-2,       GL_layer::DrawElementsIndirectCommand_menedger>,
     Data_gl_S      <TIME_BIND::SHOT,  0,       Identification>,
@@ -91,21 +80,21 @@ Storage_data<
     Data_gl_S      <TIME_BIND::SHOT,  2,       Material_T>,
                 //некрасиво числа aloc и данных
     Data_gl_array_S<TIME_BIND::SHOT,  3,     4,std::vector<int>>,//аккуратно!!
-    Data_res_one <TIME_BIND::SHOT,                                            Memory,std::shared_ptr<Buffer_mesh_S>>,
+    Data_res_one   <TIME_BIND::SHOT,             Buffer_mesh_S>,
                 //некрасиво числа aloc и данных
     Data_gl_array_S<TIME_BIND::SHOT,  6,     7,std::vector<Glif_info>,Glif_info,nullptr,TRIVIAL_DELETE::NO>,
 #ifdef BINDLES_TEXTURE
     Data_gl_S      <TIME_BIND::SHOT,  5,       uint64_t,uint64_t,nullptr,TRIVIAL_DELETE::NO>,
-    Data_res     <TIME_BIND::NEVER,                                           Memory,std::shared_ptr<Font_S>,-1>
+    Data_res     <TIME_BIND::NEVER, Unit_res,std::string,Font_S,-1>
 #else
-    Data_res    <TIME_BIND::OBJECT,                                           Memory,std::shared_ptr<Font_S>,0>
+    Data_res    <TIME_BIND::OBJECT, Unit_res,std::string,Font_S,0>
 #endif
 > ;
 
 
 enum class TYPE_TEXT{ANSI=0,UNICOD=1};
 
-class Controller_Res_2d_text: public Res_2d_text__<Storage_res_text>{
+class Controller_Res_2d_text: public Res_2d_text__{
     struct Data_CeText{
         std::filesystem::path path_font="";
         std::string text="";
@@ -120,14 +109,14 @@ public:
     using Data=Data_CeText;
 
     template<typename Info_environment>
-    Controller_Res_2d_text(Info_environment * info):Res_2d_text__<Storage_res_text>(info){
-        this->template emplace<std::shared_ptr<Buffer_mesh_S>>("plate",plate_mesh());///
+    Controller_Res_2d_text(Info_environment * info){
+        this->template emplace<Buffer_mesh_S>(plate_mesh());///
 
         GL_layer::GLSL_code_data data_shaders;
         data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::VERTEX_SHADER>  (Directory_shaders+"text_shader.vert");
         data_shaders.set_glsl_code<GL_layer::TYPE_SHADER::FRAGMENT_SHADER>(Directory_shaders+"text_shader.frag");
 
-        this->template emplace<std::shared_ptr<Shades_S>>("TEXT_SHADER",data_shaders);///
+        this->template emplace<Shades_S>(data_shaders);///
 
         std::cout<<"text_inz"<<std::endl;
     }
@@ -157,18 +146,18 @@ public:
 
 
         #ifdef BINDLES_TEXTURE
-        this->template add_element<std::shared_ptr<Font_S>>(
+        this->template add_element<Font_S>(
             id,hesh,
             std::tuple(this-> template get_element_data_GL<std::vector<Glif_info>>(),this-> template get_element_data_GL<uint64_t>())
             ,data.path_font,size);
         #else
-        this->template add_element<std::shared_ptr<Font_S>>(
+        this->template add_element<Font_S>(
             id,hesh,
             std::tuple(this-> template get_element_data_GL<std::vector<Glif_info>>())
             ,data.path_font,size);
         #endif
 
-        int id_map_bd=(*this-> template get_element<std::shared_ptr<Font_S>>(id))->get_id();//а вот тут и  проблема, можно ли получть id в бд без бд?) Можно!
+        int id_map_bd=(*this-> template get_element<Font_S>(id))->get_id();//а вот тут и  проблема, можно ли получть id в бд без бд?) Можно!
 
         this->template add_element<Position>(id,data.pos);
         this->template add_element<Material_T>(id,Material_T{id_global++,id_map_bd,data.color});

@@ -6,6 +6,8 @@
 
 namespace CeEngine {
 class SVG{
+
+public:
     float width=0.0f;
     float height=0.0f;
 
@@ -16,13 +18,18 @@ class SVG{
         glm::vec3 p3;
     };
 
-    using  ContourSVG=std::vector<CubicBez_points>;
+    struct ContourSVG{
+        std::vector<CubicBez_points> contour_data;
+        Color  color;
+        float width=0.0f;
+        char type=1;
+    };
+
 
     struct Object_SVG{
         std::vector<ContourSVG> bezie_curves_data;
         Color  color;
         std::string id;
-
         Object_SVG(Color  color_, std::string id_):color(color_),id(id_){}
     };
 

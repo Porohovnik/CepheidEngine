@@ -21,12 +21,12 @@ public:
 
         if(base!=-1){
             GL_layer::Uniform(id_texture,base);
-            std::cout<<GL_layer::Get_Error()<<"/-sheder-/"<<"///:2:"<<base<<":"<<std::endl;
+            //std::cout<<GL_layer::Get_Error()<<"/-sheder-/"<<"///:2:"<<base<<":"<<std::endl;
         }
     }
     inline void Bind(int base,int id) const{
         GL_layer::Uniform(id_pos,id);
-        std::cout<<GL_layer::Get_Error()<<"/-sheder-/"<<"///:3:"<<base<<":"<<std::endl;
+        //std::cout<<GL_layer::Get_Error()<<"/-sheder-/"<<"///:3:"<<base<<":"<<std::endl;
     }
 };
 }// namespace CeEngine

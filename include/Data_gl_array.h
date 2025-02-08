@@ -34,9 +34,7 @@ class Data_gl_array:public Data_ABC<bind_time,T,J>{
 public:
     inline static constexpr TRIVIAL_DELETE trivial_delete=t_delete;
 
-    template<typename Memory, typename Info_environment>
-    Data_gl_array(Data_herald<Memory,Info_environment> herald):
-        SSBO_VRAM(),SSBO_VRAM_allocate(),memory_controller(){}
+    Data_gl_array():SSBO_VRAM(),SSBO_VRAM_allocate(),memory_controller(){}
 
     inline bool new_frame(){return  false;}
 

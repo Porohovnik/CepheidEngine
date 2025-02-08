@@ -10,11 +10,12 @@ glm::vec3 distanse_midle_point(glm::vec3 p1, glm::vec3 p2){
 
 bool operator==(glm::vec3 p0, glm::vec3 p1){
     //std::cout<<std::abs(p0.x-p1.x)<<"|"<<std::abs(p0.y-p1.y)<<"|"<<std::abs(p0.z-p1.z)<<std::endl;
-    return ((std::abs(p0.x-p1.x)<=0.001f) && (std::abs(p0.y-p1.y)<=0.001f) && (std::abs(p0.z-p1.z)<=0.001f));
+    return ((std::abs(p0.x-p1.x)<=0.001f) && (std::abs(p0.y-p1.y)<=0.0001f) && (std::abs(p0.z-p1.z)<=0.0001f));
+    //return true;
 }
 
 bool isstraight_line(glm::vec3 & p_begin, glm::vec3 &p_end, glm::vec3 &p_test){
-    return std::abs((p_test.x - p_begin.x) / (p_end.x - p_begin.x) - (p_test.y - p_begin.y) / (p_end.y - p_begin.y)) <= 0.0001f;
+    return std::abs((p_test.x - p_begin.x) / (p_end.x - p_begin.x) - (p_test.y - p_begin.y) / (p_end.y - p_begin.y)) <= 0.00001f;
 }
 
 template <typename ...Arg>

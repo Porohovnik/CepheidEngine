@@ -8,8 +8,9 @@
 
 template<template<class Object, class Win_storage,class ... Arg> class T>
 using Milieu_=T<CeEngine::CeObject,Controller_Win_storage,
-                        Controller_Res_2d_form,
-                        Controller_Res_2d_text,
-                        Controller_Res_2d_line>;
+                         Controller_Res_2d_form
+                        ,Controller_Res_2d_text
+                        ,Controller_Res_2d_line<false>
+>;
 
 #endif // TYPE_RESOURCE_H

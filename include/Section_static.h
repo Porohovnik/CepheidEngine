@@ -4,6 +4,7 @@
 namespace CeEngine {
 template<typename J,typename T>
 class Section_static:public Section<J,T>{
+protected:
     inline static int id=0;
     int id_current;
     std::function<void()> to_vram=nullptr;

@@ -5,6 +5,13 @@
 #include "load_file.h"
 #include "GL_type_to_cpp.h"
 
+//.vert - a vertex shader
+//.tesc - a tessellation control shader
+//.tese - a tessellation evaluation shader
+//.geom - a geometry shader
+//.frag - a fragment shader
+//.comp - a compute shader
+
 namespace GL_layer {
 class GLSL_code_data{
     std::map<int,std::string> data;

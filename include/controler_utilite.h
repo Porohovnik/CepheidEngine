@@ -6,6 +6,7 @@
 #include "Identification.h"
 
 #define BINDLES_TEXTURE
+#define GL_DRAW_LINE
 using namespace  CeEngine;
 
 inline static int id_global=1;
@@ -13,7 +14,11 @@ inline static int id_global=1;
 #ifdef BINDLES_TEXTURE
 const std::string Directory_shaders="shaders/";
 #else
+#ifdef GL_DRAW_LINE
 const std::string Directory_shaders="shaders_noBindless/";
+#else
+const std::string Directory_shaders="shaders_noBindless_noGL_DRAW/";
+#endif
 #endif
 
 auto fooooo(Position &pos){

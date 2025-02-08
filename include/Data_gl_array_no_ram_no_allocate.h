@@ -5,7 +5,9 @@
 #include "Data_ABC.h"
 #include "free_memory_controler.h"
 namespace CeEngine {
-template<TIME_BIND bind_time,int bind_base,GL_layer::BUFFER_SETTING type,GL_layer::TYPE_BUFFER type_buffer,template<typename K, GL_layer::BUFFER_SETTING a,GL_layer::TYPE_BUFFER c> class Buffer,typename T,TRIVIAL_DELETE t_delete=TRIVIAL_DELETE::YES>
+template<TIME_BIND bind_time,int bind_base,GL_layer::BUFFER_SETTING type,GL_layer::TYPE_BUFFER type_buffer,
+         template<typename K, GL_layer::BUFFER_SETTING a,GL_layer::TYPE_BUFFER c> class Buffer,
+         typename T,TRIVIAL_DELETE t_delete=TRIVIAL_DELETE::YES,std::size_t size_buffer=0>
 class Data_gl_array_no_ram_no_allocate:public Data_ABC<bind_time,T,typename T::value_type>{
     struct Type_array{
         int begin=0;//из-за GLSL
@@ -19,9 +21,7 @@ class Data_gl_array_no_ram_no_allocate:public Data_ABC<bind_time,T,typename T::v
 public:
     inline static constexpr TRIVIAL_DELETE trivial_delete=t_delete;
 
-    template<typename Memory, typename Info_environment>
-    Data_gl_array_no_ram_no_allocate(Data_herald<Memory,Info_environment> herald):
-        SSBO_VRAM(),memory_controller(){}
+    Data_gl_array_no_ram_no_allocate():SSBO_VRAM(nullptr,size_buffer),memory_controller(size_buffer){}
 
     inline bool new_frame(){return  false;}
 

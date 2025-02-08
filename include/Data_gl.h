@@ -38,8 +38,7 @@ public:
     inline static constexpr TRIVIAL_DELETE trivial_delete=t_delete;
     Merge_controller merg;
 
-    template<typename Memory, typename Info_environment>
-    Data_gl(Data_herald<Memory,Info_environment> herald):SSBO_VRAM(){}
+    Data_gl():SSBO_VRAM(){}
 
     inline bool new_frame(){
         int b=false;

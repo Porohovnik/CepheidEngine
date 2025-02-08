@@ -1,44 +1,29 @@
 #ifndef DATA_RES_ONE_H
 #define DATA_RES_ONE_H
 #include <utility>
+#include <memory>
+
 #include "Data_ABC.h"
 namespace CeEngine {
-template<TIME_BIND bind_time,typename S,typename T,int bind_base=-1>
+template<TIME_BIND bind_time,typename T,int bind_base=-1>
 class Data_res_one:public Data_ABC<bind_time,T>{
-    T RES=nullptr;
-    S * storage_res_;
-
+    std::shared_ptr<T> RES=nullptr;
 public:
     inline constexpr static TYPE_RES_STORAGE type_res_=TYPE_RES_STORAGE::GLOBAL;
     inline static constexpr TYPE_CONTAINER type_container=TYPE_CONTAINER::ONE;
 
-    template<typename Memory, typename Info_environment>
-    Data_res_one(Data_herald<Memory,Info_environment> herald):storage_res_(herald.res){}
+    Data_res_one(){}
 
     template<typename ...Arg>
-    bool emplace(decltype(std::remove_reference_t<typename S::template get_unit_type<T>>::get_key()) key ,Arg...arg){
-        if(RES!=nullptr){
-            storage_res_->add_task(RES,Type_Status::CLEAR);
-        }
-        RES=storage_res_->template add_data<T>(key,std::forward<Arg>(arg)...);
-        storage_res_->add_task(RES,Type_Status::VISEBLE);
-        return true;
-    }
-
-    std::size_t add_element(decltype(std::remove_reference_t<typename S::template get_unit_type<T>>::get_key()) key){
-        if(RES!=nullptr){
-            storage_res_->add_task(RES,Type_Status::CLEAR);
-        }
-        RES=storage_res_->template get_unit<T>()->get_data(key);
-        storage_res_->add_task(RES,Type_Status::VISEBLE);
+    bool emplace(Arg &&...arg){
+        RES=std::make_shared<T>(std::forward<Arg>(arg)...);
+        RES->to_RAM();
+        RES->to_VRAM();
         return true;
     }
 
     bool earse(){
-        if(RES!=nullptr){
-            storage_res_->add_task(RES,Type_Status::CLEAR);
-            RES=nullptr;
-        }
+        RES=nullptr;
         return true;
     }
 

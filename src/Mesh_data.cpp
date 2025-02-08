@@ -18,13 +18,13 @@ std::vector<glm::vec2> Mesh_data::normalaize(unsigned int begin_offset,unsigned 
         parametr_cord_min_max[i][0]=*min;
         parametr_cord_min_max[i][1]=*max;
 
-        if(std::abs(*max-*min)>0.00001f){
-            std::for_each(Interator_different_steps(vertex.begin()+i,  info.get_offset()),
-                          Interator_different_steps(vertex.end()+i,    info.get_offset()),
-                          [min_=*min,max_=*max](auto &t){
-                          t=(t-min_)/std::abs(max_-min_);//приведение к еденичному размеру и центровка
-            });
-        }
+//        if(std::abs(*max-*min)>0.00001f){
+//            std::for_each(Interator_different_steps(vertex.begin()+i,  info.get_offset()),
+//                          Interator_different_steps(vertex.end()+i,    info.get_offset()),
+//                          [min_=*min,max_=*max](auto &t){
+//                          t=(t);//приведение к еденичному размеру и центровка
+//            });
+//        }
     }
 
     return parametr_cord_min_max;
@@ -44,17 +44,27 @@ Mesh_data::Mesh_data(std::list<glm::vec3> &point_data, std::vector<std::pair<uin
 
 
 
+    //CDT::Triangulation<int64_t> cdt;
     CDT::Triangulation<float> cdt;
-    cdt.insertVertices(point_data.begin(),
-                       point_data.end(),
-                       [](auto &t){return  t.x;},
-                       [](auto &t){return  t.y;}
-                       );
 
-    std::cout<<edgs_.size()<<" edgs_ "<<point_data.size()<<std::endl;
+    try{
+        cdt.insertVertices(point_data.begin(),
+                           point_data.end(),
+                           [](auto &t){return  t.x*1000;},
+                           [](auto &t){return  t.y*1000;}
+                           );
 
+        std::cout<<edgs_.size()<<" edgs_ "<<point_data.size()<<std::endl;
 
-    cdt.insertEdges(edgs_);
+        cdt.insertEdges(edgs_);
+   }catch (const std::exception& e)    {
+        std::cout<<"------------------------------------"<<std::endl;
+        std::cout << e.what() << '\n';
+        std::terminate();
+    }
+
+    std::cout<<"??????????????????????????????????????"<<std::endl;
+
     cdt.eraseOuterTrianglesAndHoles();
 
     std::cout<<point_data.size()<<">>>>>>>>>>>"<<cdt.triangles.size()<<std::endl;

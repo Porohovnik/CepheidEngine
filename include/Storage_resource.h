@@ -44,10 +44,12 @@ public:
         return tutl::Get_tuple_type_element<Type,std::tuple<decltype (Arg::Type())...>>(storage_data);
     }
 
-    template<typename Type,typename ...Arg_>
+    template<typename Type>
     void add_task(Type res,Type_Status status){
-        auto get=tutl::Get_tuple_type_element<Type,std::tuple<decltype (Arg::Type())...>>(storage_data);
-        get->add_task(res, status);
+        if(res!=nullptr){
+            auto get=tutl::Get_tuple_type_element<Type,std::tuple<decltype (Arg::Type())...>>(storage_data);
+            get->add_task(res, status);
+        }
     }
 };
 }// namespace CeEngine

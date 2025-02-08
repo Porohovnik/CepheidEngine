@@ -10,8 +10,8 @@ class Data_gl_one:public Data_ABC<bind_time,T,J>{
 public:
     inline static constexpr TYPE_CONTAINER type_container=TYPE_CONTAINER::ONE;
 
-    template<typename Memory, typename Info_environment>
-    Data_gl_one(Data_herald<Memory,Info_environment> herald):SSBO_VRAM(nullptr,1){}
+
+    Data_gl_one():SSBO_VRAM(nullptr,1){}
 
     bool emplace(T&&element){
         RAM=element;

@@ -25,6 +25,7 @@ public:
     Context(std::string name_okno_,int WIDTH, int HEIGHT,Color background_color_):
         Win(name_okno_,WIDTH,HEIGHT),isGLEW_true(GL_layer::Init_GLEW()), resource(background_color_,&this->ISFU){}//нельзя ресурсы инцилизировать, до glewInit
 
+
     inline static void * current_context=nullptr;//так можно, ибо констекст это общая для вообще всего
     void new_fraem(){
         if(current_context!=this){
@@ -32,20 +33,18 @@ public:
         }
         current_context=this;
 
-        bool change_view_win=false;
         resource.new_frame();
-        if(resource.Get_cout_call()){
+        resource.Get_Win_storage()->Change_wind=resource.Get_cout_call();
+        if(resource.Get_Win_storage()->Change_wind){
             rendering(&resource);
-            change_view_win=true;
             this->swap_buffer();//Win
-            std::cout<<"44444444444"<<std::endl;
+            //std::cout<<"44444444444"<<std::endl;
         }else {
             std::chrono::milliseconds timespan(16);
             std::this_thread::sleep_for(timespan);
         }
 
         signal.new_frame(&ISFU);
-        ISFU.Change_wind=change_view_win;
         ISFU.new_frame();
         //std::cout<<"555555555555"<<std::endl;
     }
